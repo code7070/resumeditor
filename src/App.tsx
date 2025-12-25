@@ -2,15 +2,11 @@ import { useState } from "react";
 import { useCVData } from "./hooks/useCVData";
 import { Editor } from "./components/Editor";
 import { Preview } from "./components/Preview";
-import { Printer, Edit3, Eye } from "lucide-react";
+import { Edit3, Eye } from "lucide-react";
 
 function App() {
   const { data, setData } = useCVData();
   const [activeTab, setActiveTab] = useState<"edit" | "preview">("edit");
-
-  const handlePrint = () => {
-    window.print();
-  };
 
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col md:flex-row font-sans text-gray-900 print:bg-white print:block">
@@ -58,18 +54,6 @@ function App() {
         <div className="max-w-[210mm] mx-auto print:py-0 shadow-sm print:shadow-none bg-white min-h-[297mm] print:m-0 print:w-full">
           <Preview data={data} />
         </div>
-
-        {/* Floating Print Button */}
-        <button
-          onClick={handlePrint}
-          className="fixed bottom-20 md:bottom-8 right-8 bg-emerald-700 text-white p-4 rounded-full shadow-xl hover:bg-emerald-800 transition-all hover:scale-105 print:hidden group z-40 flex items-center gap-2"
-          title="Print / Save as PDF"
-        >
-          <Printer size={24} />
-          <span className="max-w-0 overflow-hidden group-hover:max-w-xs transition-all duration-300 font-medium whitespace-nowrap">
-            Print Layout
-          </span>
-        </button>
       </div>
     </div>
   );

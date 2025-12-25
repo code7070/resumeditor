@@ -23,6 +23,7 @@ import {
   ShieldCheck,
   ArrowRight,
   ListRestart,
+  Printer,
 } from "lucide-react";
 import { Dialog } from "./ui/Dialog";
 import { ConfirmDialog } from "./ui/ConfirmDialog";
@@ -448,6 +449,32 @@ export function Editor({ data, setData }: EditorProps) {
         title="Export Resume"
       >
         <div className="space-y-2">
+          <button
+            onClick={() => {
+              window.print();
+              setShowExportDialog(false);
+            }}
+            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 hover:from-emerald-100 hover:to-emerald-200 rounded-lg transition-colors group text-left border border-emerald-200"
+          >
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-white rounded-md shadow-sm text-emerald-700 ring-1 ring-emerald-200">
+                <Printer size={20} />
+              </div>
+              <div>
+                <span className="block text-sm font-semibold text-gray-900">
+                  Export as PDF
+                </span>
+                <span className="block text-xs text-gray-600">
+                  Print or save your resume as PDF
+                </span>
+              </div>
+            </div>
+            <Download
+              size={16}
+              className="text-emerald-600 group-hover:text-emerald-700 transition-colors"
+            />
+          </button>
+
           <button
             onClick={() => handleExport("json")}
             className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
