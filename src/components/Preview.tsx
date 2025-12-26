@@ -12,16 +12,18 @@ export function Preview({ data }: PreviewProps) {
       ? "items-end"
       : "items-start";
 
-  const fontClass =
+  // Use specific ATS-friendly fonts
+  const fontFamily =
     data.font === "sans"
-      ? "font-sans"
+      ? "var(--font-cv-sans)" // Arial
       : data.font === "mono"
-      ? "font-mono"
-      : "font-serif";
+      ? "var(--font-cv-mono)" // Courier New
+      : "var(--font-cv-serif)"; // Times New Roman
 
   return (
     <div
-      className={`bg-white text-black p-[5mm_5mm] md:p-12 max-w-[210mm] mx-auto min-h-[297mm] shadow-lg print:shadow-none print:p-[12mm] print:max-w-none ${fontClass} text-[10pt] leading-tight`}
+      className="bg-white text-black p-[5mm_5mm] md:p-12 max-w-[210mm] mx-auto min-h-[297mm] shadow-lg print:shadow-none print:p-[12mm] print:max-w-none text-[10pt] leading-tight"
+      style={{ fontFamily }}
     >
       {/* Header */}
       <header className={`mb-4 pb-3 flex flex-col ${headerContainerAlign}`}>

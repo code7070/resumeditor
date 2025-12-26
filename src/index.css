@@ -1,7 +1,10 @@
 @import "tailwindcss";
 
 @theme {
-  --font-cv: "Times New Roman", Times, serif;
+  /* ATS-friendly fonts for resume */
+  --font-cv-serif: "Times New Roman", Times, serif;
+  --font-cv-sans: Arial, Helvetica, sans-serif;
+  --font-cv-mono: "Courier New", Courier, monospace;
 }
 
 @custom-variant dark (&:where(.dark, .dark *));
