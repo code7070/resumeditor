@@ -38,9 +38,10 @@ interface ATSHistoryItem {
 interface EditorProps {
   data: CVData;
   setData: React.Dispatch<React.SetStateAction<CVData>>;
+  previewRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export function Editor({ data, setData }: EditorProps) {
+export function Editor({ data, setData, previewRef }: EditorProps) {
   const [isRefining, setIsRefining] = useState(false);
   const [isImporting, setIsImporting] = useState(false);
   const [showUploadDialog, setShowUploadDialog] = useState(false);
@@ -77,6 +78,13 @@ export function Editor({ data, setData }: EditorProps) {
   const [copyStatus, setCopyStatus] = useState<"idle" | "md" | "tex" | "json">(
     "idle"
   );
+
+  // Refine AI State
+  const [showRefineConsent, setShowRefineConsent] = useState(false);
+  const [refineConsentAccepted, setRefineConsentAccepted] = useState(false);
+  const [showRefineResults, setShowRefineResults] = useState(false);
+  const [showRefineSelection, setShowRefineSelection] = useState(false);
+  const [refineOptions, setRefineOptions] = useState<string[]>([]);
 
   useEffect(() => {
     const saved = localStorage.getItem("ats_history");
@@ -124,17 +132,39 @@ export function Editor({ data, setData }: EditorProps) {
     });
   };
 
-  const handleRefineSummary = async () => {
+  const handleRefineSummary = () => {
     if (!data.summary) return;
+    setShowRefineConsent(true);
+  };
+
+  const handleConsentConfirmed = () => {
+    setShowRefineConsent(false);
+    setShowRefineSelection(true);
+  };
+
+  const executeRefine = async (type: "summary" | "full") => {
+    setShowRefineSelection(false);
+    setShowRefineResults(true);
     setIsRefining(true);
+    setRefineOptions([]); // Clear previous options
+
     try {
-      const refined = await refineText(data.summary);
-      setData((prev) => ({ ...prev, summary: refined }));
+      const options = await refineText(
+        data.summary,
+        type === "full" ? data : undefined
+      );
+      setRefineOptions(options);
     } catch (_e) {
       alert("Failed to refine text. Ensure VITE_GEMINI_API_KEY is set in .env");
+      setShowRefineResults(false);
     } finally {
       setIsRefining(false);
     }
+  };
+
+  const applyRefineOption = (option: string) => {
+    setData((prev) => ({ ...prev, summary: option }));
+    setShowRefineResults(false);
   };
 
   const handleAnalyzeATS = async () => {
@@ -190,6 +220,12 @@ export function Editor({ data, setData }: EditorProps) {
     navigator.clipboard.writeText(content);
     setCopyStatus(type);
     setTimeout(() => setCopyStatus("idle"), 2000);
+  };
+
+  const handleExportPDF = () => {
+    // Use native browser print which is more reliable for Tailwind v4 colors
+    window.print();
+    setShowExportDialog(false);
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -441,10 +477,7 @@ export function Editor({ data, setData }: EditorProps) {
       >
         <div className="space-y-2">
           <button
-            onClick={() => {
-              window.print();
-              setShowExportDialog(false);
-            }}
+            onClick={handleExportPDF}
             className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 hover:from-emerald-100 hover:to-emerald-200 rounded-lg transition-colors group text-left border border-emerald-200"
           >
             <div className="flex items-center gap-3">
@@ -453,10 +486,10 @@ export function Editor({ data, setData }: EditorProps) {
               </div>
               <div>
                 <span className="block text-sm font-semibold text-gray-900">
-                  Export as PDF
+                  Print / Save as PDF
                 </span>
                 <span className="block text-xs text-gray-600">
-                  Print or save your resume as PDF
+                  Use system dialog to save as PDF
                 </span>
               </div>
             </div>
@@ -725,6 +758,147 @@ export function Editor({ data, setData }: EditorProps) {
             </div>
           )}
         </div>
+      </Dialog>
+
+      {/* Refine Selection Dialog */}
+      <Dialog
+        isOpen={showRefineSelection}
+        onClose={() => setShowRefineSelection(false)}
+        title="Enhance Summary"
+      >
+        <div className="space-y-4 py-2">
+          <button
+            onClick={() => executeRefine("summary")}
+            className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50/30 transition-all group flex items-start gap-4"
+          >
+            <div className="p-2 bg-emerald-100 text-emerald-600 rounded-lg group-hover:bg-emerald-200 transition-colors">
+              <SparkleIcon className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-900 text-sm">Quick Polish</h4>
+              <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                Refine sentence structure and tone based only on your current
+                summary text. Best for quick grammar and style fixes.
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-emerald-500 ml-auto mt-2" />
+          </button>
+
+          <button
+            onClick={() => executeRefine("full")}
+            className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-blue-500 hover:bg-blue-50/30 transition-all group flex items-start gap-4"
+          >
+            <div className="p-2 bg-blue-100 text-blue-600 rounded-lg group-hover:bg-blue-200 transition-colors">
+              <FileText className="w-5 h-5" />
+            </div>
+            <div>
+              <h4 className="font-bold text-gray-900 text-sm">Deep Analysis</h4>
+              <p className="text-xs text-gray-500 mt-1 leading-relaxed">
+                Generate a new summary by analyzing your entire CV (experience,
+                skills, header). Best for creating impactful, comprehensive
+                introductions.
+              </p>
+            </div>
+            <ArrowRight className="w-4 h-4 text-gray-300 group-hover:text-blue-500 ml-auto mt-2" />
+          </button>
+        </div>
+      </Dialog>
+
+      {/* Refine Consent Dialog */}
+      <Dialog
+        isOpen={showRefineConsent}
+        onClose={() => setShowRefineConsent(false)}
+        title="AI Refine Consent"
+      >
+        <div className="space-y-6 py-4">
+          <div className="bg-emerald-50 p-6 rounded-2xl border border-emerald-100 flex flex-col items-center text-center">
+            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-emerald-600 shadow-sm mb-4">
+              <SparkleIcon className="w-6 h-6" />
+            </div>
+            <h3 className="text-base font-bold text-gray-900">
+              AI Content Refinement
+            </h3>
+            <p className="text-xs text-gray-600 mt-2 leading-relaxed">
+              We use Google Gemini AI to analyze your resume content and
+              generate professional variations. Your data will be processed
+              securely.
+            </p>
+          </div>
+
+          <label className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
+            <input
+              type="checkbox"
+              className="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
+              checked={refineConsentAccepted}
+              onChange={(e) => setRefineConsentAccepted(e.target.checked)}
+            />
+            <span className="text-xs text-gray-700 leading-tight">
+              I consent to send my content (Summary or Full CV) to AI for
+              refinement and understand Use of AI.
+            </span>
+          </label>
+
+          <div className="flex gap-3">
+            <button
+              onClick={() => setShowRefineConsent(false)}
+              className="flex-1 py-3 text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors"
+            >
+              Cancel
+            </button>
+            <button
+              disabled={!refineConsentAccepted}
+              onClick={handleConsentConfirmed}
+              className="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-600/10"
+            >
+              Start Refining
+            </button>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Refine Results Dialog */}
+      <Dialog
+        isOpen={showRefineResults}
+        onClose={() => !isRefining && setShowRefineResults(false)}
+        title={isRefining ? "Refining Summary..." : "Choose a Version"}
+      >
+        {isRefining ? (
+          <div className="py-12 flex flex-col items-center justify-center space-y-6">
+            <div className="relative">
+              <div className="w-16 h-16 border-4 border-emerald-50 border-t-emerald-600 rounded-full animate-spin"></div>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <SparkleIcon className="w-6 h-6 text-emerald-600" />
+              </div>
+            </div>
+            <div className="text-center space-y-2">
+              <p className="text-sm font-bold text-gray-900">
+                Generating Improvements...
+              </p>
+              <p className="text-xs text-gray-500">
+                Creating professional variations for you.
+              </p>
+            </div>
+          </div>
+        ) : (
+          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+            {refineOptions.map((option, idx) => (
+              <button
+                key={idx}
+                onClick={() => applyRefineOption(option)}
+                className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50/30 transition-all group"
+              >
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="text-[10px] font-bold px-2 py-1 rounded bg-gray-100 text-gray-600 group-hover:bg-emerald-100 group-hover:text-emerald-700 transition-colors uppercase tracking-wider">
+                    Option {idx + 1}
+                  </span>
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed dark:text-gray-300">
+                  {option}
+                </p>
+              </button>
+            ))}
+          </div>
+        )}
       </Dialog>
 
       <ConfirmDialog

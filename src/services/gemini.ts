@@ -16,8 +16,30 @@ const SchemaType = {
   OBJECT: "OBJECT",
 } as const;
 
-export async function refineText(text: string): Promise<string> {
+export async function refineText(
+  text: string,
+  context?: CVData
+): Promise<string[]> {
   if (!API_KEY) throw new Error("Missing VITE_GEMINI_API_KEY");
+
+  const schema = {
+    type: SchemaType.OBJECT,
+    properties: {
+      options: {
+        type: SchemaType.ARRAY,
+        items: { type: SchemaType.STRING },
+      },
+    },
+    required: ["options"],
+  };
+
+  const contextPrompt = context
+    ? `\n\nFull CV Context:\n${JSON.stringify(context, null, 2)}`
+    : "";
+
+  const systemInstruction = context
+    ? `You are an expert CV writer. Create 3 distinct professional summary options based on the provided CV data. Ensure they highlight key achievements and specific skills found in the full context.`
+    : `Refine this text to be more professional, concise, and impactful for a CV/Resume. Provide 3 distinct options/variations.`;
 
   try {
     const response = await client.models.generateContent({
@@ -27,16 +49,23 @@ export async function refineText(text: string): Promise<string> {
           role: "user",
           parts: [
             {
-              text: `Refine this text to be more professional, concise, and impactful for a CV/Resume:\n\n"${text}"`,
+              text: `${systemInstruction}\n\nCurrent Summary Draft: "${text}"${contextPrompt}`,
             },
           ],
         },
       ],
+      config: {
+        responseMimeType: "application/json",
+        responseSchema: schema,
+      },
     });
 
     // @ts-ignore
     const textPart = response.candidates?.[0]?.content?.parts?.[0]?.text;
-    return textPart || text;
+    if (!textPart) return [text];
+
+    const parsed = JSON.parse(textPart);
+    return parsed.options || [text];
   } catch (e) {
     console.error("Gemini Refine Error:", e);
     throw e;
