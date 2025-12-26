@@ -289,7 +289,7 @@ export async function exportToPDF_legacy(
       windowWidth: element.scrollWidth,
       windowHeight: element.scrollHeight,
       ignoreElements: (el) => el.classList?.contains("print:hidden"),
-      onclone: (clonedDoc) => {
+      onclone: (_clonedDoc) => {
         // Failsafe: if there are any remaining style tags injecting global styles,
         // we arguably can't easily clean them here without parsing CSS.
         // But our element-level overrides should take precedence.

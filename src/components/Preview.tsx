@@ -31,15 +31,14 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
       >
         {/* Header */}
         <header className={`mb-2 pb-3 flex flex-col ${headerContainerAlign}`}>
-          <h1
-            className="font-bold tracking-tight mb-1"
-            style={{ fontSize: "16pt" }}
-          >
+          <h1 className="font-bold tracking-tight" style={{ fontSize: "16pt" }}>
             {data.header.name}
           </h1>
-          <div className="font-semibold mb-1" style={{ fontSize: "13pt" }}>
-            {data.header.role}
-          </div>
+          {data.header.role && (
+            <div className="font-semibold mb-1" style={{ fontSize: "13pt" }}>
+              {data.header.role}
+            </div>
+          )}
 
           <div
             className={`flex flex-wrap gap-x-2 text-black items-center ${
@@ -152,40 +151,42 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
           </section>
         )}
 
-        {/* Custom Sections */}
-        {data.customSections.map((section) => (
-          <section key={section.id} className="mb-4">
-            <h2
-              className="font-bold mb-2 border-b border-black/50 pb-0.5"
-              style={{ fontSize: "12pt" }}
-            >
-              {section.name}
-            </h2>
-            <div className="space-y-2">
-              {section.items.map((item) => (
-                <div key={item.id}>
-                  <div className="flex justify-between items-baseline mb-0.5">
-                    <h3 className="font-bold" style={{ fontSize: "11pt" }}>
-                      {item.title}
-                    </h3>
-                    <span
-                      className="font-medium whitespace-nowrap"
-                      style={{ fontSize: "10pt" }}
+        <div className="space-y-4">
+          {/* Custom Sections */}
+          {data.customSections.map((section) => (
+            <section key={section.id}>
+              <h2
+                className="font-bold mb-2 border-b border-black/50 pb-0.5"
+                style={{ fontSize: "12pt" }}
+              >
+                {section.name}
+              </h2>
+              <div className="space-y-2">
+                {section.items.map((item) => (
+                  <div key={item.id}>
+                    <div className="flex justify-between items-baseline mb-0.5">
+                      <h3 className="font-bold" style={{ fontSize: "11pt" }}>
+                        {item.title}
+                      </h3>
+                      <span
+                        className="font-medium whitespace-nowrap"
+                        style={{ fontSize: "10pt" }}
+                      >
+                        {item.year}
+                      </span>
+                    </div>
+                    <div
+                      className="text-black leading-snug"
+                      style={{ fontSize: "11pt" }}
                     >
-                      {item.year}
-                    </span>
+                      {item.description}
+                    </div>
                   </div>
-                  <div
-                    className="text-black leading-snug"
-                    style={{ fontSize: "11pt" }}
-                  >
-                    {item.description}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        ))}
+                ))}
+              </div>
+            </section>
+          ))}
+        </div>
       </div>
     );
   }

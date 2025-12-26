@@ -18,7 +18,8 @@ const SchemaType = {
 
 export async function refineText(
   text: string,
-  context?: CVData
+  context?: CVData,
+  userPrompt?: string
 ): Promise<string[]> {
   if (!API_KEY) throw new Error("Missing VITE_GEMINI_API_KEY");
 
@@ -37,9 +38,13 @@ export async function refineText(
     ? `\n\nFull CV Context:\n${JSON.stringify(context, null, 2)}`
     : "";
 
+  const additionalInstruction = userPrompt
+    ? `\n\nUser Instruction: ${userPrompt}\n(Please follow this instruction strictly while generating the options)`
+    : "";
+
   const systemInstruction = context
-    ? `You are an expert CV writer. Create 3 distinct professional summary options based on the provided CV data. Ensure they highlight key achievements and specific skills found in the full context.`
-    : `Refine this text to be more professional, concise, and impactful for a CV/Resume. Provide 3 distinct options/variations.`;
+    ? `You are an expert CV writer. Create 3 distinct professional summary options based on the provided CV data. Ensure they highlight key achievements and specific skills found in the full context.${additionalInstruction}`
+    : `Refine this text to be more professional, concise, and impactful for a CV/Resume. Provide 3 distinct options/variations.${additionalInstruction}`;
 
   try {
     const response = await client.models.generateContent({
