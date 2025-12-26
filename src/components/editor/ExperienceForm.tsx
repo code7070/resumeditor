@@ -131,9 +131,9 @@ export function ExperienceForm({
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 flex justify-between items-center">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
             Experience
           </h3>
           <button
@@ -143,7 +143,7 @@ export function ExperienceForm({
             <Plus size={14} /> Add Position
           </button>
         </div>
-        <div className="p-4 bg-white">
+        <div className="p-4 bg-white dark:bg-gray-800">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="experience" type="EXPERIENCE_LIST">
               {(provided) => (
@@ -164,13 +164,13 @@ export function ExperienceForm({
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            className="border border-gray-200 rounded-lg overflow-hidden bg-white ring-1 ring-black/0 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all"
+                            className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 ring-1 ring-black/0 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all"
                           >
                             <div
                               className={`flex justify-between items-center p-3 cursor-pointer transition-colors ${
                                 isExpanded
-                                  ? "bg-gray-50 border-b border-gray-200"
-                                  : "hover:bg-gray-50"
+                                  ? "bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700"
+                                  : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
                               }`}
                               onClick={() =>
                                 setExpandedId(isExpanded ? null : exp.id)
@@ -179,11 +179,11 @@ export function ExperienceForm({
                               <div className="flex items-center gap-3">
                                 <div
                                   {...provided.dragHandleProps}
-                                  className="text-gray-300 hover:text-gray-500 p-1"
+                                  className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 p-1"
                                 >
                                   <GripVertical size={16} />
                                 </div>
-                                <div className="font-semibold text-gray-700 text-sm">
+                                <div className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
                                   {exp.title || "Untitled Position"}
                                 </div>
                               </div>
@@ -193,7 +193,7 @@ export function ExperienceForm({
                                     e.stopPropagation();
                                     removeExperience(exp.id);
                                   }}
-                                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                  className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                                 >
                                   <Trash2 size={14} />
                                 </button>
@@ -212,10 +212,10 @@ export function ExperienceForm({
                             </div>
 
                             {isExpanded && (
-                              <div className="p-4 space-y-4 bg-white cursor-default">
+                              <div className="p-4 space-y-4 bg-white dark:bg-gray-800 cursor-default">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                   <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                       Title / Company
                                     </label>
                                     <input
@@ -228,12 +228,12 @@ export function ExperienceForm({
                                           e.target.value
                                         )
                                       }
-                                      className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-sm placeholder:text-gray-400"
+                                      className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                       placeholder="e.g. Senior Developer"
                                     />
                                   </div>
                                   <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                       Year / Duration
                                     </label>
                                     <input
@@ -246,13 +246,13 @@ export function ExperienceForm({
                                           e.target.value
                                         )
                                       }
-                                      className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-sm placeholder:text-gray-400"
+                                      className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                       placeholder="e.g. 2020 - Present"
                                     />
                                   </div>
                                 </div>
                                 <div className="space-y-1">
-                                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Description
                                   </label>
                                   <textarea
@@ -264,21 +264,21 @@ export function ExperienceForm({
                                         e.target.value
                                       )
                                     }
-                                    className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none h-24 resize-none text-sm placeholder:text-gray-400 leading-relaxed"
+                                    className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none h-24 resize-none text-sm placeholder:text-gray-400 leading-relaxed"
                                     placeholder="Brief description of your role..."
                                   />
                                 </div>
 
                                 <div className="space-y-3 pt-2">
                                   <div className="flex justify-between items-center">
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                       Key Achievements
                                     </label>
                                     <button
                                       onClick={() =>
                                         addItemToExperience(exp.id)
                                       }
-                                      className="text-xs text-emerald-700 font-semibold hover:text-emerald-800 flex items-center gap-1"
+                                      className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold hover:text-emerald-800 dark:hover:text-emerald-200 flex items-center gap-1"
                                     >
                                       <Plus size={12} /> Add Item
                                     </button>
@@ -303,11 +303,11 @@ export function ExperienceForm({
                                               <div
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
-                                                className="flex gap-2 items-start bg-gray-50 p-2 rounded-lg group border border-transparent hover:border-gray-200 transition-colors"
+                                                className="flex gap-2 items-start bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg group border border-transparent hover:border-gray-200 dark:hover:border-gray-600 transition-colors"
                                               >
                                                 <div
                                                   {...provided.dragHandleProps}
-                                                  className="text-gray-300 hover:text-gray-500 cursor-move mt-2"
+                                                  className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 cursor-move mt-2"
                                                 >
                                                   <GripVertical size={14} />
                                                 </div>
@@ -321,7 +321,7 @@ export function ExperienceForm({
                                                         e.target.value
                                                       )
                                                     }
-                                                    className="w-full bg-transparent border-0 outline-none text-sm focus:ring-0 p-0 resize-none h-auto min-h-[1.5rem]"
+                                                    className="w-full bg-transparent border-0 outline-none text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-0 p-0 resize-none h-auto min-h-[1.5rem]"
                                                     placeholder="Achievement or responsibility..."
                                                     rows={Math.max(
                                                       1,
@@ -338,7 +338,7 @@ export function ExperienceForm({
                                                       item.id
                                                     )
                                                   }
-                                                  className="p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                  className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 >
                                                   <Trash2 size={14} />
                                                 </button>
@@ -360,7 +360,7 @@ export function ExperienceForm({
                   })}
                   {provided.placeholder}
                   {(!data || data.length === 0) && (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                    <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">
                       No experience listed yet.
                     </div>
                   )}

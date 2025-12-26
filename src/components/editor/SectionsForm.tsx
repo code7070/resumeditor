@@ -132,19 +132,19 @@ export function SectionsForm({
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 flex justify-between items-center">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
             Additional Sections
           </h3>
           <button
             onClick={addSection}
-            className="flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 font-semibold px-3 py-1.5 rounded-md transition-colors border border-emerald-100"
+            className="flex items-center gap-1.5 text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-800 dark:hover:text-emerald-200 font-semibold px-3 py-1.5 rounded-md transition-colors border border-emerald-100 dark:border-emerald-800"
           >
             <Plus size={14} /> Add Section
           </button>
         </div>
-        <div className="p-4 bg-white">
+        <div className="p-4 bg-white dark:bg-gray-800">
           <DragDropContext onDragEnd={onDragEnd}>
             <Droppable droppableId="sections" type="SECTIONS_LIST">
               {(provided) => (
@@ -165,13 +165,13 @@ export function SectionsForm({
                           <div
                             ref={provided.innerRef}
                             {...provided.draggableProps}
-                            className="border border-gray-200 rounded-lg overflow-hidden bg-white ring-1 ring-black/0 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all"
+                            className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 ring-1 ring-black/0 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all"
                           >
                             <div
                               className={`flex justify-between items-center p-3 cursor-pointer transition-colors ${
                                 isExpanded
-                                  ? "bg-gray-50 border-b border-gray-200"
-                                  : "hover:bg-gray-50"
+                                  ? "bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700"
+                                  : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
                               }`}
                               onClick={() =>
                                 setExpandedSectionId(
@@ -182,11 +182,11 @@ export function SectionsForm({
                               <div className="flex items-center gap-3">
                                 <div
                                   {...provided.dragHandleProps}
-                                  className="text-gray-300 hover:text-gray-500 p-1"
+                                  className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 p-1"
                                 >
                                   <GripVertical size={16} />
                                 </div>
-                                <div className="font-semibold text-gray-700 text-sm">
+                                <div className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
                                   {section.name || "Untitled Section"}
                                 </div>
                               </div>
@@ -196,28 +196,28 @@ export function SectionsForm({
                                     e.stopPropagation();
                                     removeSection(section.id);
                                   }}
-                                  className="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                                  className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
                                 >
                                   <Trash2 size={14} />
                                 </button>
                                 {isExpanded ? (
                                   <ChevronUp
                                     size={16}
-                                    className="text-gray-400"
+                                    className="text-gray-400 dark:text-gray-500"
                                   />
                                 ) : (
                                   <ChevronDown
                                     size={16}
-                                    className="text-gray-400"
+                                    className="text-gray-400 dark:text-gray-500"
                                   />
                                 )}
                               </div>
                             </div>
 
                             {isExpanded && (
-                              <div className="p-4 border-t border-gray-200 space-y-4 bg-white cursor-default">
+                              <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-4 bg-white dark:bg-gray-800 cursor-default">
                                 <div className="space-y-1">
-                                  <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                     Section Name
                                   </label>
                                   <input
@@ -229,20 +229,20 @@ export function SectionsForm({
                                         e.target.value
                                       )
                                     }
-                                    className="w-full p-2.5 border border-gray-200 rounded-lg focus:border-emerald-500 outline-none font-bold text-emerald-900 transition-all"
+                                    className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 outline-none font-bold text-emerald-900 transition-all"
                                   />
                                 </div>
 
-                                <div className="space-y-3 pl-3 border-l-2 border-emerald-50">
+                                <div className="space-y-3 pl-3 border-l-2 border-emerald-50 dark:border-emerald-900/30">
                                   <div className="flex justify-between items-center">
-                                    <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                                       Items
                                     </label>
                                     <button
                                       onClick={() =>
                                         addItemToSection(section.id)
                                       }
-                                      className="text-xs text-emerald-700 font-semibold hover:text-emerald-800 flex items-center gap-1"
+                                      className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold hover:text-emerald-800 dark:hover:text-emerald-200 flex items-center gap-1"
                                     >
                                       <Plus size={12} /> Add Item
                                     </button>
@@ -268,11 +268,11 @@ export function SectionsForm({
                                               <div
                                                 ref={provided.innerRef}
                                                 {...provided.draggableProps}
-                                                className="p-3 bg-gray-50 rounded-lg space-y-3 relative group border border-transparent hover:border-gray-200 transition-all"
+                                                className="p-3 bg-gray-50 dark:bg-gray-700/50 rounded-lg space-y-3 relative group border border-transparent hover:border-gray-200 dark:hover:border-gray-600 transition-all"
                                               >
                                                 <div
                                                   {...provided.dragHandleProps}
-                                                  className="absolute top-3 left-2 text-gray-300 hover:text-gray-500 cursor-move z-10"
+                                                  className="absolute top-3 left-2 text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 cursor-move z-10"
                                                 >
                                                   <GripVertical size={16} />
                                                 </div>
@@ -284,7 +284,7 @@ export function SectionsForm({
                                                       item.id
                                                     )
                                                   }
-                                                  className="absolute top-2 right-2 p-1 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                                                  className="absolute top-2 right-2 p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
                                                 >
                                                   <Trash2 size={14} />
                                                 </button>
@@ -301,7 +301,7 @@ export function SectionsForm({
                                                         e.target.value
                                                       )
                                                     }
-                                                    className="col-span-2 p-2 border border-gray-200 rounded-md focus:border-emerald-500 outline-none text-sm placeholder:text-gray-400 font-medium"
+                                                    className="col-span-2 p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-md focus:border-emerald-500 dark:focus:border-emerald-400 outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 font-medium"
                                                     placeholder="Item Title"
                                                   />
                                                   <input
@@ -315,7 +315,7 @@ export function SectionsForm({
                                                         e.target.value
                                                       )
                                                     }
-                                                    className="col-span-1 p-2 border border-gray-200 rounded-md focus:border-emerald-500 outline-none text-sm placeholder:text-gray-400 text-right"
+                                                    className="col-span-1 p-2 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-md focus:border-emerald-500 dark:focus:border-emerald-400 outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 text-right"
                                                     placeholder="Year"
                                                   />
                                                 </div>
@@ -329,7 +329,7 @@ export function SectionsForm({
                                                       e.target.value
                                                     )
                                                   }
-                                                  className="w-full p-2 ml-6 border border-gray-200 rounded-md focus:border-emerald-500 outline-none text-sm h-16 resize-none placeholder:text-gray-400"
+                                                  className="w-full p-2 ml-6 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-md focus:border-emerald-500 dark:focus:border-emerald-400 outline-none text-sm h-16 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500"
                                                   placeholder="Description"
                                                   style={{
                                                     width:
@@ -354,7 +354,7 @@ export function SectionsForm({
                   })}
                   {provided.placeholder}
                   {(!data || data.length === 0) && (
-                    <div className="text-center py-8 text-gray-400 text-sm">
+                    <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">
                       No custom sections added.
                     </div>
                   )}

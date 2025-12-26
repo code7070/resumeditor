@@ -249,36 +249,27 @@ export function Editor({ data, setData }: EditorProps) {
   };
 
   return (
-    <div className="bg-white h-full overflow-y-auto p-6 space-y-8 shadow-sm">
-      <div className="flex flex-col gap-4 items-start">
-        <div>
-          <h2 className="text-xl font-bold text-gray-900 mb-1">Editor</h2>
-          <p className="text-gray-500 text-xs">
-            Update your resume information below.
-          </p>
-        </div>
-
-        {/* Actions */}
-        <div className="flex gap-2">
-          <button
-            onClick={() => setShowUploadDialog(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-emerald-50 text-emerald-800 rounded-md hover:bg-emerald-100 transition-colors text-xs font-semibold border border-emerald-200"
-          >
-            <Upload size={14} /> Import
-          </button>
-          <button
-            onClick={() => setShowExportDialog(true)}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-50 text-gray-700 rounded-md hover:bg-gray-100 transition-colors text-xs font-medium border border-gray-200"
-          >
-            <Share2 size={14} /> Export
-          </button>
-          <button
-            onClick={openATSDialog}
-            className="flex items-center gap-2 px-3 py-2 bg-blue-50 text-blue-800 rounded-md hover:bg-blue-100 transition-colors text-xs font-semibold border border-blue-200"
-          >
-            <ShieldCheck size={14} /> Scanner ATS
-          </button>
-        </div>
+    <div className="bg-white dark:bg-gray-900 h-full p-6 space-y-8">
+      {/* Actions */}
+      <div className="flex gap-2">
+        <button
+          onClick={() => setShowUploadDialog(true)}
+          className="flex items-center gap-2 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 rounded-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors text-xs font-semibold border border-emerald-200 dark:border-emerald-800"
+        >
+          <Upload size={14} /> Import
+        </button>
+        <button
+          onClick={() => setShowExportDialog(true)}
+          className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs font-medium border border-gray-200 dark:border-gray-700"
+        >
+          <Share2 size={14} /> Export
+        </button>
+        <button
+          onClick={openATSDialog}
+          className="flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-xs font-semibold border border-blue-200 dark:border-blue-800"
+        >
+          <ShieldCheck size={14} /> Scanner ATS
+        </button>
       </div>
 
       {/* Upload Dialog */}
@@ -763,18 +754,18 @@ export function Editor({ data, setData }: EditorProps) {
       />
 
       <div className="space-y-1 mb-4">
-        <div className="text-xs font-semibold text-gray-500 uppercase tracking-wider block">
+        <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider block">
           Font Style
         </div>
-        <div className="flex bg-gray-50 p-1 rounded-lg border border-gray-200 w-fit">
+        <div className="flex bg-gray-50 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 w-fit">
           {(["serif", "sans", "mono"] as const).map((font) => (
             <button
               key={font}
               onClick={() => setData((prev) => ({ ...prev, font }))}
               className={`px-3 py-1.5 text-xs rounded-md capitalize transition-all ${
                 data.font === font
-                  ? "bg-white shadow-sm text-emerald-900 font-semibold ring-1 ring-black/5"
-                  : "text-gray-500 hover:text-gray-900 hover:bg-gray-100"
+                  ? "bg-white dark:bg-gray-700 shadow-sm text-emerald-900 dark:text-emerald-300 font-semibold ring-1 ring-black/5 dark:ring-white/10"
+                  : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
               }`}
             >
               {font === "serif"
@@ -787,13 +778,13 @@ export function Editor({ data, setData }: EditorProps) {
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 bg-gray-50/50">
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
             Header Details
           </h3>
         </div>
-        <div className="p-4 bg-white">
+        <div className="p-4 bg-white dark:bg-gray-800">
           <HeaderForm
             data={data.header}
             onChange={(h) => setData((prev) => ({ ...prev, header: h }))}
@@ -802,15 +793,15 @@ export function Editor({ data, setData }: EditorProps) {
         </div>
       </div>
 
-      <div className="bg-gray-50 rounded-xl border border-gray-200 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 bg-gray-50/50 flex justify-between items-center">
-          <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider">
+      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
+        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 flex justify-between items-center">
+          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
             Professional Summary
           </h3>
           <button
             onClick={handleRefineSummary}
             disabled={isRefining || !data.summary}
-            className="text-emerald-700 flex items-center gap-1.5 text-[11px] hover:text-emerald-800 disabled:opacity-50 font-semibold bg-emerald-50 px-2 py-1 rounded hover:bg-emerald-100 transition-colors border border-emerald-100"
+            className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 text-[11px] hover:text-emerald-800 dark:hover:text-emerald-200 disabled:opacity-50 font-semibold bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800"
           >
             {isRefining ? (
               <Loader2 className="w-3 h-3 animate-spin" />
@@ -820,13 +811,13 @@ export function Editor({ data, setData }: EditorProps) {
             Refine with AI
           </button>
         </div>
-        <div className="p-4 bg-white">
+        <div className="p-4 bg-white dark:bg-gray-800">
           <textarea
             value={data.summary}
             onChange={(e) =>
               setData((prev) => ({ ...prev, summary: e.target.value }))
             }
-            className="w-full h-32 p-3 border border-gray-200 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-sm leading-relaxed placeholder:text-gray-400"
+            className="w-full h-32 p-3 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 dark:focus:ring-emerald-400 outline-none transition-all text-sm leading-relaxed placeholder:text-gray-400 dark:placeholder:text-gray-500"
             placeholder="Write a compelling professional summary..."
           />
         </div>
@@ -846,7 +837,7 @@ export function Editor({ data, setData }: EditorProps) {
         confirmDelete={confirmDelete}
       />
 
-      <div className="pt-8 text-center text-xs text-gray-400">
+      <div className="pt-8 text-center text-xs text-gray-400 dark:text-gray-500">
         <p>Built with React & Tailwind V4</p>
       </div>
     </div>

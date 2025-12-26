@@ -4,8 +4,9 @@
   --font-cv: "Times New Roman", Times, serif;
 }
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 :root {
-  font-family: var(--font-cv);
   line-height: 1.5;
   font-weight: 400;
 
@@ -14,8 +15,16 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
+  /* Light theme colors */
   --color-background: #ffffff;
   --color-text: #000000;
+}
+
+.dark {
+  /* Dark theme colors */
+  --color-background: #1f2937;
+  --color-text: #f9fafb;
+  color-scheme: dark;
 }
 
 @media print {
