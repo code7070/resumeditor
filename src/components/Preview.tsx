@@ -26,7 +26,7 @@ export function Preview({ data }: PreviewProps) {
       style={{ fontFamily }}
     >
       {/* Header */}
-      <header className={`mb-4 pb-3 flex flex-col ${headerContainerAlign}`}>
+      <header className={`mb-2 pb-3 flex flex-col ${headerContainerAlign}`}>
         <h1 className="text-2xl font-bold tracking-tight mb-1">
           {data.header.name}
         </h1>
