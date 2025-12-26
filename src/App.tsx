@@ -4,6 +4,7 @@ import { Preview } from "./components/Preview";
 import { ThemeProvider } from "./context/ThemeContext";
 import { ThemeToggle } from "./components/ui/ThemeToggle";
 import { useRef } from "react";
+import { EditorActions } from "./components/editor/EditorActions";
 
 export function App() {
   const { data, setData } = useCVData();
@@ -14,11 +15,20 @@ export function App() {
       <div className="flex h-screen overflow-hidden print:h-auto print:overflow-visible print:block">
         {/* Sidebar Panel */}
         <aside className="w-[450px] lg:w-[500px] shrink-0 overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 print:hidden">
-          <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900">
-            <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-              Editor
-            </h2>
-            <ThemeToggle />
+          <div className="sticky top-0 z-10 p-4  border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4">
+            <div className="flex items-center justify-between ">
+              <div className="flex flex-col gap-0.5">
+                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+                  Resum<span className="text-orange-600">editor</span>
+                </h2>
+                <p className="text-xs text-gray-500">
+                  100% local-stored, except AI usability{" "}
+                  <i>(by your concern)</i>
+                </p>
+              </div>
+              <ThemeToggle />
+            </div>
+            <EditorActions data={data} setData={setData} />
           </div>
           <Editor data={data} setData={setData} previewRef={previewRef} />
         </aside>
