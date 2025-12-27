@@ -10,7 +10,7 @@ import {
   ListRestart,
   ArrowRight,
 } from "lucide-react";
-import { Dialog } from "../../ui/Dialog";
+import { DialogApp } from "../../ui/DialogApp";
 import { ConfirmDialog } from "../../ui/ConfirmDialog";
 import { ATSAnalysisArt } from "../../ATSAnalysisArt";
 
@@ -120,11 +120,11 @@ export function ScannerAction({ data }: ScannerActionProps) {
             className="transition-all group-hover:-translate-y-full"
           />
         </div>
-        Scanner ATS
+        <span className="hidden md:inline">Scanner</span> ATS
       </button>
 
       {/* ATS Result Dialog */}
-      <Dialog
+      <DialogApp
         isOpen={showATSDialog}
         onClose={() => !isAnalyzingATS && setShowATSDialog(false)}
         title="ATS Analysis Report"
@@ -303,7 +303,7 @@ export function ScannerAction({ data }: ScannerActionProps) {
             </div>
           )}
         </div>
-      </Dialog>
+      </DialogApp>
       <ConfirmDialog
         isOpen={showRescanConfirm}
         title="Re-Scan Optimization"

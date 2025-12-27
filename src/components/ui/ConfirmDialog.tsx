@@ -1,4 +1,4 @@
-import { Dialog } from "./Dialog";
+import { DialogApp } from "./DialogApp";
 import { AlertTriangle } from "lucide-react";
 
 interface ConfirmDialogProps {
@@ -23,7 +23,7 @@ export function ConfirmDialog({
   isDestructive = true,
 }: ConfirmDialogProps) {
   return (
-    <Dialog isOpen={isOpen} onClose={onClose} title={title}>
+    <DialogApp isOpen={isOpen} onClose={onClose} title={title}>
       <div className="space-y-6 py-2 px-6">
         <div className="flex items-center gap-4 p-4 bg-amber-50 rounded-xl border border-amber-100">
           <div className="shrink-0 p-2 bg-white rounded-full shadow-sm text-amber-600">
@@ -56,6 +56,6 @@ export function ConfirmDialog({
           </button>
         </div>
       </div>
-    </Dialog>
+    </DialogApp>
   );
 }

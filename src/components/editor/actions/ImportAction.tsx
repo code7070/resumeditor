@@ -3,7 +3,7 @@ import type { CVData } from "../../../types";
 import { SparkleIcon } from "../../icons/SparkleIcon";
 import { parseResumeFromPdf } from "../../../services/gemini";
 import { Upload, SparklesIcon, Loader2 } from "lucide-react";
-import { Dialog } from "../../ui/Dialog";
+import { DialogApp } from "../../ui/DialogApp";
 
 interface ImportActionProps {
   setData: React.Dispatch<React.SetStateAction<CVData>>;
@@ -93,11 +93,11 @@ export function ImportAction({ setData }: ImportActionProps) {
             className="transition-all group-hover:-translate-y-full"
           />
         </div>
-        Import
+        <span className="hidden md:inline">Import</span>
       </button>
 
       {/* Upload Dialog */}
-      <Dialog
+      <DialogApp
         isOpen={showUploadDialog}
         onClose={() => !isImporting && setShowUploadDialog(false)}
         title="Import Resume"
@@ -165,10 +165,10 @@ export function ImportAction({ setData }: ImportActionProps) {
             </div>
           </div>
         </div>
-      </Dialog>
+      </DialogApp>
 
       {/* Import Consent Dialog */}
-      <Dialog
+      <DialogApp
         isOpen={showImportConsent}
         onClose={() => {
           setShowImportConsent(false);
@@ -255,7 +255,7 @@ export function ImportAction({ setData }: ImportActionProps) {
             </button>
           </div>
         </div>
-      </Dialog>
+      </DialogApp>
     </>
   );
 }

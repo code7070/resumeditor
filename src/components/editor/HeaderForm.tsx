@@ -135,7 +135,7 @@ export function HeaderForm({ data, onChange, confirmDelete }: HeaderFormProps) {
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className="flex gap-2 items-center group"
+                        className="flex gap-2 items-start group"
                       >
                         <div
                           {...provided.dragHandleProps}
@@ -143,27 +143,29 @@ export function HeaderForm({ data, onChange, confirmDelete }: HeaderFormProps) {
                         >
                           <GripVertical size={14} />
                         </div>
-                        <input
-                          type="text"
-                          value={link.label}
-                          onChange={(e) =>
-                            updateLink(link.id, "label", e.target.value)
-                          }
-                          className="flex-1 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                          placeholder="Label"
-                        />
-                        <input
-                          type="text"
-                          value={link.url}
-                          onChange={(e) =>
-                            updateLink(link.id, "url", e.target.value)
-                          }
-                          className="flex-2 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                          placeholder="URL"
-                        />
+                        <div className="flex flex-col md:flex-row gap-2 flex-1">
+                          <input
+                            type="text"
+                            value={link.label}
+                            onChange={(e) =>
+                              updateLink(link.id, "label", e.target.value)
+                            }
+                            className="flex-1 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            placeholder="Label"
+                          />
+                          <input
+                            type="text"
+                            value={link.url}
+                            onChange={(e) =>
+                              updateLink(link.id, "url", e.target.value)
+                            }
+                            className="flex-2 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            placeholder="URL"
+                          />
+                        </div>
                         <button
                           onClick={() => removeLink(link.id)}
-                          className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors opacity-0 group-hover:opacity-100"
+                          className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                         >
                           <Trash2 size={15} />
                         </button>

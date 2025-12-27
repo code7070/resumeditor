@@ -10,7 +10,7 @@ import {
   FileCode,
   Check,
 } from "lucide-react";
-import { Dialog } from "../../ui/Dialog";
+import { DialogApp } from "../../ui/DialogApp";
 
 interface ExportActionProps {
   data: CVData;
@@ -55,11 +55,11 @@ export function ExportAction({ data }: ExportActionProps) {
         onClick={() => setShowExportDialog(true)}
         className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs font-medium border border-gray-200 dark:border-gray-700"
       >
-        <Share2 size={14} /> Export
+        <Share2 size={14} /> <span className="hidden md:inline">Export</span>
       </button>
 
       {/* Export Dialog */}
-      <Dialog
+      <DialogApp
         isOpen={showExportDialog}
         onClose={() => setShowExportDialog(false)}
         title="Export Resume"
@@ -165,7 +165,7 @@ export function ExportAction({ data }: ExportActionProps) {
             )}
           </button>
         </div>
-      </Dialog>
+      </DialogApp>
     </>
   );
 }

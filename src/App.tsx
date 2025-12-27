@@ -2,42 +2,91 @@ import { useCVData } from "./hooks/useCVData";
 import { Editor } from "./components/Editor";
 import { Preview } from "./components/Preview";
 import { ThemeProvider } from "./context/ThemeContext";
-import { ThemeToggle } from "./components/ui/ThemeToggle";
 import { useRef } from "react";
 import { EditorActions } from "./components/editor/EditorActions";
+import {
+  SidebarInset,
+  SidebarProvider,
+  SidebarTrigger,
+} from "./components/ui/sidebar";
+import { AppSidebar } from "./components/AppSidebar";
+import { Separator } from "./components/ui/separator";
+
+import { useState } from "react";
+import { ConfirmDialog } from "./components/ui/ConfirmDialog";
 
 export function App() {
   const { data, setData } = useCVData();
   const previewRef = useRef<HTMLDivElement>(null);
 
+  const [deleteConfirm, setDeleteConfirm] = useState<{
+    isOpen: boolean;
+    title: string;
+    message: string;
+    onConfirm: () => void;
+  }>({
+    isOpen: false,
+    title: "",
+    message: "",
+    onConfirm: () => {},
+  });
+
+  const confirmDelete = (
+    title: string,
+    message: string,
+    onConfirm: () => void
+  ) => {
+    setDeleteConfirm({
+      isOpen: true,
+      title,
+      message,
+      onConfirm,
+    });
+  };
+
   return (
     <ThemeProvider>
-      <div className="flex h-screen overflow-hidden print:h-auto print:overflow-visible print:block">
-        {/* Sidebar Panel */}
-        <aside className="w-[450px] lg:w-[500px] shrink-0 overflow-y-auto border-r border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 print:hidden">
-          <div className="sticky top-0 z-10 p-4  border-b border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 space-y-4">
-            <div className="flex items-center justify-between ">
-              <div className="flex flex-col gap-0.5">
-                <h2 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                  Resum<span className="text-orange-600">editor</span>
-                </h2>
-                <p className="text-xs text-gray-500">
-                  100% local-stored, except AI usability{" "}
-                  <i>(by your concern)</i>
-                </p>
-              </div>
-              <ThemeToggle />
+      <SidebarProvider>
+        <AppSidebar
+          data={data}
+          setData={setData}
+          confirmDelete={confirmDelete}
+        />
+        <SidebarInset>
+          <header className="sticky top-0 flex h-14 shrink-0 items-center gap-2 border-b bg-background px-4 print:hidden">
+            <SidebarTrigger className="-ml-1" />
+            <Separator orientation="vertical" className="mr-2 h-4" />
+            <div className="flex flex-1 items-center justify-between">
+              <span className="font-semibold text-sm">Editor</span>
+              <EditorActions data={data} setData={setData} />
             </div>
-            <EditorActions data={data} setData={setData} />
+          </header>
+          <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:overflow-hidden print:p-0 print:block">
+            {/* Editor Column */}
+            {/* <div className="flex-1 overflow-y-auto rounded-xl border bg-background shadow-sm lg:max-w-lg print:hidden">
+              <Editor
+                data={data}
+                setData={setData}
+                confirmDelete={confirmDelete}
+              />
+            </div> */}
+            {/* Preview Column */}
+            <main className="flex-1 overflow-y-auto bg-muted/20 p-4 print:border-none print:p-0 print:overflow-visible">
+              <Preview ref={previewRef} data={data} />
+            </main>
           </div>
-          <Editor data={data} setData={setData} previewRef={previewRef} />
-        </aside>
+        </SidebarInset>
 
-        {/* Preview Pane */}
-        <main className="flex-1 overflow-y-auto bg-gray-100 dark:bg-gray-950 p-10 print:p-0 print:overflow-visible print:bg-white print:block">
-          <Preview ref={previewRef} data={data} />
-        </main>
-      </div>
+        <ConfirmDialog
+          isOpen={deleteConfirm.isOpen}
+          title={deleteConfirm.title}
+          message={deleteConfirm.message}
+          onConfirm={deleteConfirm.onConfirm}
+          onClose={() =>
+            setDeleteConfirm((prev) => ({ ...prev, isOpen: false }))
+          }
+        />
+      </SidebarProvider>
     </ThemeProvider>
   );
 }
