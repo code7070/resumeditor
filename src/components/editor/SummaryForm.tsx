@@ -1,6 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { SparkleIcon } from "../icons/SparkleIcon";
+import { AiConsentDialog } from "../ui/AiConsentDialog";
 import { DialogApp } from "../ui/DialogApp";
 import { refineText } from "../../services/gemini";
 import type { CVData } from "../../types";
@@ -11,12 +12,15 @@ interface SummaryFormProps {
   fullData: CVData;
 }
 
-export function SummaryForm({ data, onChange, fullData }: SummaryFormProps) {
+export function SummaryForm({
+  data,
+  onChange,
+  fullData,
+}: Readonly<SummaryFormProps>) {
   const [isRefining, setIsRefining] = useState(false);
 
   // Refine AI State
   const [showRefineConsent, setShowRefineConsent] = useState(false);
-  const [refineConsentAccepted, setRefineConsentAccepted] = useState(false);
   const [showRefineResults, setShowRefineResults] = useState(false);
   const [showRefineSelection, setShowRefineSelection] = useState(false);
   const [refineOptions, setRefineOptions] = useState<string[]>([]);
@@ -158,47 +162,23 @@ export function SummaryForm({ data, onChange, fullData }: SummaryFormProps) {
       </DialogApp>
 
       {/* Refine Consent Dialog */}
-      <DialogApp
+      <AiConsentDialog
         isOpen={showRefineConsent}
         onClose={() => setShowRefineConsent(false)}
+        onConfirm={handleConsentConfirmed}
         title="AI Assistance Consent"
-      >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-600 dark:text-gray-300">
-            For the purpose of refining your summary, the content of your CV
+        description="For the purpose of refining your summary, the content of your CV
             will be sent to Google's Gemini AI. This data is only used for
-            processing your request and is not stored permanently.
-          </p>
-          <label className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
-            <input
-              type="checkbox"
-              className="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
-              checked={refineConsentAccepted}
-              onChange={(e) => setRefineConsentAccepted(e.target.checked)}
-            />
-            <span className="text-xs text-gray-700 leading-tight">
-              I consent to send my content (Summary or Full CV) to AI for
-              refinement and understand Use of AI.
-            </span>
-          </label>
-
-          <div className="flex gap-3">
-            <button
-              onClick={() => setShowRefineConsent(false)}
-              className="flex-1 py-3 text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              disabled={!refineConsentAccepted}
-              onClick={handleConsentConfirmed}
-              className="flex-1 py-3 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-emerald-600/10"
-            >
-              Start Refining
-            </button>
-          </div>
-        </div>
-      </DialogApp>
+            processing your request and is not stored permanently."
+        confirmLabel="Start Refining"
+        consentItems={[
+          {
+            id: "ai_refine",
+            label:
+              "I consent to send my content (Summary or Full CV) to AI for refinement and understand Use of AI.",
+          },
+        ]}
+      />
 
       {/* Refine Results Dialog */}
       <DialogApp

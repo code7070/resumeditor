@@ -10,6 +10,7 @@ import {
   ListRestart,
   ArrowRight,
 } from "lucide-react";
+import { AiConsentDialog } from "../../ui/AiConsentDialog";
 import { DialogApp } from "../../ui/DialogApp";
 import { ConfirmDialog } from "../../ui/ConfirmDialog";
 import { ATSAnalysisArt } from "../../ATSAnalysisArt";
@@ -24,18 +25,14 @@ interface ScannerActionProps {
   data: CVData;
 }
 
-export function ScannerAction({ data }: ScannerActionProps) {
+export function ScannerAction({ data }: Readonly<ScannerActionProps>) {
   const [showATSDialog, setShowATSDialog] = useState(false);
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
   const [isAnalyzingATS, setIsAnalyzingATS] = useState(false);
   const [atsResult, setAtsResult] = useState<ATSAnalysisResult | null>(null);
   const [atsHistory, setAtsHistory] = useState<ATSHistoryItem[]>([]);
-  const [atsConsentAccepted, setAtsConsentAccepted] = useState({
-    data: false,
-    ai: false,
-  });
   const [viewingHistoryItem, setViewingHistoryItem] =
     useState<ATSHistoryItem | null>(null);
-  const [showConsentGate, setShowConsentGate] = useState(true);
   const [showRescanConfirm, setShowRescanConfirm] = useState(false);
 
   useEffect(() => {
@@ -75,7 +72,6 @@ export function ScannerAction({ data }: ScannerActionProps) {
     setShowATSDialog(true);
     setAtsResult(null);
     setViewingHistoryItem(null);
-    setShowConsentGate(false);
     try {
       const result = await analyzeATSScore(data);
       setAtsResult(result);
@@ -95,12 +91,11 @@ export function ScannerAction({ data }: ScannerActionProps) {
   };
 
   const openATSDialog = () => {
-    setShowATSDialog(true);
     // Show consent gate only if no result exists and no history
     if (!atsResult && atsHistory.length === 0) {
-      setShowConsentGate(true);
+      setShowConsentDialog(true);
     } else {
-      setShowConsentGate(false);
+      setShowATSDialog(true);
     }
   };
 
@@ -130,77 +125,7 @@ export function ScannerAction({ data }: ScannerActionProps) {
         title="ATS Analysis Report"
       >
         <div className="space-y-6 max-h-[85vh] overflow-y-auto pr-2 custom-scrollbar -mx-2 px-2">
-          {showConsentGate ? (
-            <div className="space-y-6 py-4">
-              <div className="bg-blue-50 p-6 rounded-2xl border border-blue-100 flex flex-col items-center text-center">
-                <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center text-blue-600 shadow-sm mb-4">
-                  <ShieldCheck size={24} />
-                </div>
-                <h3 className="text-base font-bold text-gray-900">
-                  AI Processing Consent
-                </h3>
-                <p className="text-xs text-gray-600 mt-2 leading-relaxed">
-                  To provide high-quality ATS scoring, we use Google Gemini AI
-                  to analyze your resume content. Your data is processed
-                  securely and not stored permanently on our servers.
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                <label className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
-                  <input
-                    type="checkbox"
-                    className="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
-                    checked={atsConsentAccepted.data}
-                    onChange={(e) =>
-                      setAtsConsentAccepted((prev) => ({
-                        ...prev,
-                        data: e.target.checked,
-                      }))
-                    }
-                  />
-                  <span className="text-xs text-gray-700 leading-tight">
-                    I am okay to send my information (Contact, Experience,
-                    Skills) for processing.
-                  </span>
-                </label>
-
-                <label className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200">
-                  <input
-                    type="checkbox"
-                    className="mt-1 w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500"
-                    checked={atsConsentAccepted.ai}
-                    onChange={(e) =>
-                      setAtsConsentAccepted((prev) => ({
-                        ...prev,
-                        ai: e.target.checked,
-                      }))
-                    }
-                  />
-                  <span className="text-xs text-gray-700 leading-tight">
-                    I understand that an AI will evaluate my resume against
-                    industry standards.
-                  </span>
-                </label>
-              </div>
-
-              <div className="flex gap-3">
-                <button
-                  onClick={() => setShowATSDialog(false)}
-                  className="flex-1 py-3 text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors"
-                >
-                  Cancel
-                </button>
-                <button
-                  disabled={!atsConsentAccepted.ai || !atsConsentAccepted.data}
-                  onClick={handleAnalyzeATS}
-                  className="flex-1 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-black/10"
-                >
-                  Start Scanning
-                </button>
-              </div>
-            </div>
-          ) : isAnalyzingATS ? (
+          {isAnalyzingATS ? (
             <div className="py-20 flex flex-col items-center justify-center space-y-6">
               <div className="relative">
                 <div className="w-20 h-20 border-4 border-blue-50 border-t-blue-600 rounded-full animate-spin"></div>
@@ -253,7 +178,7 @@ export function ScannerAction({ data }: ScannerActionProps) {
                   Recent Scans
                 </h3>
                 <button
-                  onClick={() => setShowConsentGate(true)}
+                  onClick={() => setShowConsentDialog(true)}
                   className="text-[10px] font-bold text-blue-600 hover:underline"
                 >
                   New Scan
@@ -304,6 +229,34 @@ export function ScannerAction({ data }: ScannerActionProps) {
           )}
         </div>
       </DialogApp>
+
+      <AiConsentDialog
+        isOpen={showConsentDialog}
+        onClose={() => setShowConsentDialog(false)}
+        onConfirm={() => {
+          setShowConsentDialog(false);
+          handleAnalyzeATS();
+        }}
+        title="AI Processing Consent"
+        description="To provide high-quality ATS scoring, we use Google Gemini AI
+                  to analyze your resume content. Your data is processed
+                  securely and not stored permanently on our servers."
+        confirmLabel="Start Scanning"
+        icon="shield"
+        consentItems={[
+          {
+            id: "data_share",
+            label:
+              "I am okay to send my information (Contact, Experience, Skills) for processing.",
+          },
+          {
+            id: "ai_eval",
+            label:
+              "I understand that an AI will evaluate my resume against industry standards.",
+          },
+        ]}
+      />
+
       <ConfirmDialog
         isOpen={showRescanConfirm}
         title="Re-Scan Optimization"
