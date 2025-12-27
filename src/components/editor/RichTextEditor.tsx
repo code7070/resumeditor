@@ -1,15 +1,16 @@
 import { useCallback, useMemo, useState, useEffect } from "react";
-import { Editable, withReact, Slate, useSlate } from "slate-react";
+import { Editable, withReact, Slate, useSlate, ReactEditor } from "slate-react";
 import {
   Editor,
   Transforms,
   createEditor,
   type Descendant,
   Element as SlateElement,
-  Text,
-  Range,
+  Text as SlateText,
+  Range as SlateRange,
+  type BaseEditor,
 } from "slate";
-import { withHistory } from "slate-history";
+import { withHistory, type HistoryEditor } from "slate-history";
 import {
   Bold,
   Italic,
@@ -36,7 +37,7 @@ type CustomText = {
 
 declare module "slate" {
   interface CustomTypes {
-    Editor: Editor;
+    Editor: BaseEditor & ReactEditor & HistoryEditor;
     Element: CustomElement;
     Text: CustomText;
   }
@@ -63,7 +64,7 @@ const applyMark = (node: any, attrs: any): any => {
   if (typeof node === "string") {
     return jsx("text", attrs, node);
   }
-  if (Text.isText(node)) {
+  if (SlateText.isText(node)) {
     return { ...node, ...attrs };
   }
   if (node.children) {
@@ -128,7 +129,7 @@ const serializeText = (node: CustomText) => {
 const serializeElement = (node: CustomElement): string => {
   const children = (node.children || [])
     .map((n) => {
-      if (Text.isText(n)) return serializeText(n as any);
+      if (SlateText.isText(n)) return serializeText(n as any);
       return serializeElement(n as any);
     })
     .join("");
@@ -151,7 +152,7 @@ const serializeElement = (node: CustomElement): string => {
 const serialize = (nodes: Descendant[]) => {
   return nodes
     .map((n) => {
-      if (Text.isText(n)) return serializeText(n as any);
+      if (SlateText.isText(n)) return serializeText(n as any);
       return serializeElement(n as any);
     })
     .join("");
@@ -171,8 +172,17 @@ const toggleBlock = (editor: Editor, format: string) => {
     split: true,
   });
 
+  let type: string;
+  if (isActive) {
+    type = "paragraph";
+  } else if (isList) {
+    type = "list-item";
+  } else {
+    type = format;
+  }
+
   const newProperties: Partial<SlateElement> = {
-    type: isActive ? "paragraph" : isList ? "list-item" : (format as any),
+    type: type as any,
   };
   Transforms.setNodes<SlateElement>(editor, newProperties);
 
@@ -239,7 +249,7 @@ const wrapLink = (editor: Editor, url: string) => {
   }
 
   const { selection } = editor;
-  const isCollapsed = selection && Range.isCollapsed(selection);
+  const isCollapsed = selection && SlateRange.isCollapsed(selection);
   const link = {
     type: "link",
     url,

@@ -1,8 +1,7 @@
 import { useCVData } from "./hooks/useCVData";
-import { Editor } from "./components/Editor";
 import { Preview } from "./components/Preview";
 import { ThemeProvider } from "./context/ThemeContext";
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import { EditorActions } from "./components/editor/EditorActions";
 import {
   SidebarInset,
@@ -11,8 +10,6 @@ import {
 } from "./components/ui/sidebar";
 import { AppSidebar } from "./components/AppSidebar";
 import { Separator } from "./components/ui/separator";
-
-import { useState } from "react";
 import { ConfirmDialog } from "./components/ui/ConfirmDialog";
 
 export function App() {

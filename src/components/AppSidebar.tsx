@@ -55,7 +55,7 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
   const [isExperienceDialogOpen, setIsExperienceDialogOpen] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
-  const { setOpen, setOpenMobile, isMobile } = useSidebar();
+  const { setOpenMobile, isMobile } = useSidebar();
 
   const closeSidebarOnInteract = () => {
     if (isMobile) {

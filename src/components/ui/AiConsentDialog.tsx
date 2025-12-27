@@ -28,8 +28,8 @@ export function AiConsentDialog({
   consentItems,
   confirmLabel = "Proceed",
   icon = "sparkles",
-  isDestructive = false,
-}: Readonly<AiConsentDialogProps>) {
+}: // isDestructive = false,
+Readonly<AiConsentDialogProps>) {
   const [acceptedItems, setAcceptedItems] = useState<Record<string, boolean>>(
     {}
   );
