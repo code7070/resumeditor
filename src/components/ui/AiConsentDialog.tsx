@@ -79,7 +79,7 @@ export function AiConsentDialog({
             >
               <input
                 type="checkbox"
-                className={`mt-1 w-4 h-4 rounded border-gray-300 focus:ring-offset-0 focus:ring-0 cursor-pointer ${
+                className={`w-4 h-4 rounded border-gray-300 focus:ring-offset-0 focus:ring-0 cursor-pointer ${
                   icon === "shield"
                     ? "text-blue-600 focus:ring-blue-500 checked:bg-blue-600"
                     : "text-emerald-600 focus:ring-emerald-500 checked:bg-emerald-600"
@@ -103,14 +103,14 @@ export function AiConsentDialog({
         <div className="flex gap-3 pt-2">
           <button
             onClick={onClose}
-            className="flex-1 py-3 text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors"
+            className="flex-1 py-3 text-xs font-bold text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-400 rounded transition-colors"
           >
             Cancel
           </button>
           <button
             disabled={!allAccepted}
             onClick={onConfirm}
-            className={`flex-1 py-3 text-white rounded-xl text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 ${confirmBtnClass}`}
+            className={`flex-1 py-3 text-white rounded text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 ${confirmBtnClass}`}
           >
             {confirmLabel}
           </button>

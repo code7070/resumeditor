@@ -4,6 +4,7 @@ import { SparkleIcon } from "../icons/SparkleIcon";
 import { AiConsentDialog } from "../ui/AiConsentDialog";
 import { DialogApp } from "../ui/DialogApp";
 import { refineText } from "../../services/gemini";
+import { RichTextEditor } from "./RichTextEditor";
 import type { CVData } from "../../types";
 
 interface SummaryFormProps {
@@ -63,13 +64,15 @@ export function SummaryForm({
   };
 
   const applyRefineOption = (option: string) => {
-    onChange(option);
+    // If AI output is plain text, wrap it in a paragraph
+    const htmlContent = option.startsWith("<p>") ? option : `<p>${option}</p>`;
+    onChange(htmlContent);
     setShowRefineResults(false);
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
+      {/* <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
         <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
           Content
         </label>
@@ -85,14 +88,29 @@ export function SummaryForm({
           )}
           Refine with AI
         </button>
-      </div>
+      </div> */}
 
-      <textarea
+      <RichTextEditor
         value={data}
-        onChange={(e) => onChange(e.target.value)}
-        className="w-full h-64 p-3 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 dark:focus:ring-emerald-400 outline-none transition-all text-sm leading-relaxed placeholder:text-gray-400 dark:placeholder:text-gray-500 resize-none"
+        onChange={onChange}
         placeholder="Write a compelling professional summary..."
+        className="h-64"
       />
+
+      <div className="flex justify-end">
+        <button
+          onClick={handleRefineSummary}
+          disabled={isRefining}
+          className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 text-[11px] hover:text-emerald-800 dark:hover:text-emerald-200 disabled:opacity-50 font-semibold bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800"
+        >
+          {isRefining ? (
+            <Loader2 className="w-3 h-3 animate-spin" />
+          ) : (
+            <SparkleIcon className="w-3 h-3" />
+          )}
+          Refine with AI
+        </button>
+      </div>
 
       {/* Refine Selection Dialog */}
       <DialogApp

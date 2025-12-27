@@ -30,12 +30,14 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
         style={{ fontFamily, fontSize: "11pt" }}
       >
         {/* Header */}
-        <header className={`mb-2 pb-3 flex flex-col ${headerContainerAlign}`}>
+        <header
+          className={`mb-2 pb-3 flex flex-col gap-1 ${headerContainerAlign}`}
+        >
           <h1 className="font-bold tracking-tight" style={{ fontSize: "16pt" }}>
             {data.header.name}
           </h1>
           {data.header.role && (
-            <div className="font-semibold mb-1" style={{ fontSize: "13pt" }}>
+            <div className="font-semibold" style={{ fontSize: "13pt" }}>
               {data.header.role}
             </div>
           )}
@@ -95,12 +97,11 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
             >
               SUMMARY
             </h2>
-            <p
+            <div
               className="text-black leading-snug text-justify"
               style={{ fontSize: "11pt" }}
-            >
-              {data.summary}
-            </p>
+              dangerouslySetInnerHTML={{ __html: data.summary }}
+            />
           </section>
         )}
 

@@ -118,12 +118,12 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
             <SidebarMenuItem>
               <SidebarMenuButton size="lg" asChild>
                 <div className="flex items-center gap-2 cursor-pointer">
-                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-emerald-600 text-white">
+                  <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-orange-600 text-white">
                     <FileText className="size-4" />
                   </div>
                   <div className="flex flex-col gap-0.5 leading-none">
                     <span className="font-semibold">Resumeditor</span>
-                    <span className="">v1.0.0</span>
+                    <span className="">v0.0.1</span>
                   </div>
                 </div>
               </SidebarMenuButton>
@@ -246,6 +246,16 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
+          <div className="text-xs">
+            <span className="opacity-70">Made with lazy by</span>{" "}
+            <a
+              href="https://underline.id/"
+              target="_blank"
+              className="text-orange-600 hover:underline"
+            >
+              Underline
+            </a>
+          </div>
           <div className="p-1">
             <ThemeToggle />
           </div>
