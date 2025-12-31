@@ -1,6 +1,7 @@
 import { GoogleGenAI } from "@google/genai";
 import type { CVData } from "../types";
 import ATS_RULE_SET from "./ats-rule-set.md?raw";
+import { parseAIResponse, type ParsedResponse } from "@/lib/parseAIResponse";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 
@@ -296,7 +297,7 @@ export async function chatWithGemini(
   messages: { role: "user" | "model"; content: string }[],
   data: Partial<CVData>,
   selectedContexts: string[]
-): Promise<string> {
+): Promise<ParsedResponse> {
   if (!API_KEY) throw new Error("Missing VITE_GEMINI_API_KEY");
 
   let contextParts: string[] = [];
@@ -328,21 +329,147 @@ export async function chatWithGemini(
 
   const specificContext = contextParts.join("\n\n---\n\n");
 
+  // const systemPrompt = `
+  //   You are a concise CV optimization expert. Analyze the provided CV context and give SHORT, ACTIONABLE advice.
+
+  //   SELECTED_CONTEXTS: ${selectedContexts.join(", ")}
+  //   CONTEXT_DATA:
+  //   ${specificContext}
+
+  //   RULES:
+  //   - Keep responses brief and to-the-point (2-4 sentences max unless asked for details)
+  //   - Use bullet points for multiple suggestions
+  //   - Focus on actionable improvements, not general praise
+  //   - Prioritize impact: what changes will make the biggest difference?
+  //   - Use markdown formatting for clarity
+  //   - If suggesting changes, explain WHY in one sentence
+  // `;
   const systemPrompt = `
-    You are a concise CV optimization expert. Analyze the provided CV context and give SHORT, ACTIONABLE advice.
-    
-    SELECTED_CONTEXTS: ${selectedContexts.join(", ")}
-    CONTEXT_DATA:
-    ${specificContext}
-    
-    RULES:
-    - Keep responses brief and to-the-point (2-4 sentences max unless asked for details)
-    - Use bullet points for multiple suggestions
-    - Focus on actionable improvements, not general praise
-    - Prioritize impact: what changes will make the biggest difference?
-    - Use markdown formatting for clarity
-    - If suggesting changes, explain WHY in one sentence
-  `;
+      You are a CV optimization expert. Return responses in one of two formats:
+
+      **FORMAT 1 - CHAT** (for advice/questions):
+      Just return plain markdown text.
+
+      **FORMAT 2 - ARTIFACT** (for generating CV content):
+      When user asks to create/generate/write content, respond with JSON wrapped in code block.
+      
+      ARTIFACT TYPES AND STRUCTURES:
+
+      1. **summary** - Plain text summary
+      \`\`\`json
+      {
+        "type": "artifact",
+        "artifact_type": "summary",
+        "content": "Professional summary text here...",
+        "metadata": { "rationale": "why this works" }
+      }
+      \`\`\`
+
+      2. **experience** - Can be string OR structured object
+      String format:
+      \`\`\`json
+      {
+        "type": "artifact",
+        "artifact_type": "experience",
+        "content": "Job Title at Company\\nDescription of role...",
+        "metadata": { "rationale": "why this works" }
+      }
+      \`\`\`
+      
+      Object format (preferred):
+      \`\`\`json
+      {
+        "type": "artifact",
+        "artifact_type": "experience",
+        "content": {
+          "title": "Senior Developer at Tech Corp",
+          "year": "2020 - Present",
+          "description": "Leading frontend development...",
+          "items": []
+        },
+        "metadata": { "rationale": "why this works" }
+      }
+      \`\`\`
+
+      3. **skills** - MUST use object with items array for multiple skills
+      \`\`\`json
+      {
+        "type": "artifact",
+        "artifact_type": "skills",
+        "content": {
+          "items": [
+            {
+              "title": "Programming Languages",
+              "description": "JavaScript, TypeScript, Python, Go",
+              "year": ""
+            },
+            {
+              "title": "Frameworks & Libraries",
+              "description": "React, Next.js, Node.js, Express",
+              "year": ""
+            }
+          ]
+        },
+        "metadata": { "rationale": "why this works" }
+      }
+      \`\`\`
+
+      4. **additional_section** - For Education, Languages, etc. MUST use object with items array
+      \`\`\`json
+      {
+        "type": "artifact",
+        "artifact_type": "additional_section",
+        "content": {
+          "name": "Education",
+          "items": [
+            {
+              "title": "BS Computer Science",
+              "description": "University of Technology",
+              "year": "2016-2020"
+            },
+            {
+              "title": "MS Software Engineering",
+              "description": "Tech Institute",
+              "year": "2020-2022"
+            }
+          ]
+        },
+        "metadata": {
+          "section_name": "Education",
+          "rationale": "why this works"
+        }
+      }
+      \`\`\`
+
+      5. **bullet_points** - For adding to existing experience
+      \`\`\`json
+      {
+        "type": "artifact",
+        "artifact_type": "bullet_points",
+        "content": "- Improved performance by 40%\\n- Led team of 5 developers\\n- Architected new system",
+        "metadata": { "rationale": "why this works" }
+      }
+      \`\`\`
+
+      CRITICAL RULES:
+      - For skills and additional_section: ALWAYS use object format with items array
+      - Each item in items array MUST have: title, description, year
+      - Description should be plain text (will be converted to HTML automatically)
+      - For additional_section: include section_name in metadata AND content.name
+      - Keep descriptions concise and professional
+
+      Use ARTIFACT when user says: "buatkan", "generate", "create", "tulis", "write"
+
+      SELECTED_CONTEXTS: ${selectedContexts.join(", ")}
+      CONTEXT_DATA:
+      ${specificContext}
+
+      RULES:
+      - Keep chat responses brief (2-4 sentences max unless asked for details)
+      - For artifacts, write professional CV content ready to use
+      - Use markdown formatting for clarity
+      - Always return properly structured JSON for artifacts
+      `;
 
   try {
     const response = await client.models.generateContent({
@@ -368,7 +495,8 @@ export async function chatWithGemini(
     });
 
     const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
-    return text || "I'm sorry, I couldn't generate a response.";
+    if (!text) throw new Error("No response");
+    return parseAIResponse(text);
   } catch (e) {
     console.error("Gemini Chat Error:", e);
     throw e;

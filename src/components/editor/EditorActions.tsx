@@ -43,7 +43,9 @@ export function EditorActions({
   isAiChatOpen,
   setIsAiChatOpen,
 }: Readonly<EditorActionsProps>) {
-  const formatted = formatRelative(new Date(data.lastSaved || ""), new Date());
+  const formatted = data.lastSaved
+    ? formatRelative(new Date(data.lastSaved), new Date())
+    : "";
 
   return (
     <div className="flex items-center gap-2 sm:gap-4">

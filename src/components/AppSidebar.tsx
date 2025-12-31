@@ -246,18 +246,18 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
           </SidebarGroup>
         </SidebarContent>
         <SidebarFooter>
-          <div className="text-xs">
-            <span className="opacity-70">Made with 💤 by</span>{" "}
-            <a
-              href="https://underline.id/"
-              target="_blank"
-              className="text-orange-600 underline"
-            >
-              Underline
-            </a>
-          </div>
-          <div className="p-1">
+          <div className="p-1 flex items-center gap-3">
             <ThemeToggle />
+            <span className="text-xs w-fit">
+              <span className="opacity-70">Made with 💤 by</span>{" "}
+              <a
+                href="https://underline.id/"
+                target="_blank"
+                className="text-orange-600 underline"
+              >
+                Underline
+              </a>
+            </span>
           </div>
         </SidebarFooter>
       </Sidebar>

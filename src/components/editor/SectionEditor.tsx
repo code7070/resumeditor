@@ -6,6 +6,7 @@ import {
   Draggable,
   type DropResult,
 } from "@hello-pangea/dnd";
+import { RichTextEditor } from "./RichTextEditor";
 
 interface SectionEditorProps {
   section: CustomSection;
@@ -17,7 +18,7 @@ export function SectionEditor({
   section,
   onChange,
   onDelete,
-}: SectionEditorProps) {
+}: Readonly<SectionEditorProps>) {
   const updateSectionName = (name: string) => {
     onChange({ ...section, name });
   };
@@ -124,7 +125,6 @@ export function SectionEditor({
                         >
                           <GripVertical size={16} />
                         </div>
-
                         <button
                           onClick={() => removeItem(item.id)}
                           className="absolute top-2 right-2 p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
@@ -132,7 +132,6 @@ export function SectionEditor({
                         >
                           <Trash2 size={14} />
                         </button>
-
                         <div className="grid grid-cols-3 gap-2 pl-6">
                           <input
                             type="text"
@@ -153,17 +152,16 @@ export function SectionEditor({
                             placeholder="Year"
                           />
                         </div>
-                        <textarea
-                          value={item.description}
-                          onChange={(e) =>
-                            updateItem(item.id, "description", e.target.value)
-                          }
-                          className="w-full p-2 ml-6 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-transparent focus:bg-white dark:focus:bg-gray-950 border-gray-100 dark:border-gray-800 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-md outline-none text-sm h-16 resize-none placeholder:text-gray-400 dark:placeholder:text-gray-500 transition-all"
-                          placeholder="Description"
-                          style={{
-                            width: "calc(100% - 1.5rem)",
-                          }}
-                        />
+                        <div className="pl-6 pt-1">
+                          <RichTextEditor
+                            value={item.description}
+                            onChange={(val: string) =>
+                              updateItem(item.id, "description", val)
+                            }
+                            placeholder="Description"
+                            className="min-h-[100px]"
+                          />
+                        </div>
                       </div>
                     )}
                   </Draggable>

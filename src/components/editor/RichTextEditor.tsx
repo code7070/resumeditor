@@ -387,9 +387,14 @@ export function RichTextEditor({
   placeholder,
   className,
 }: Readonly<RichTextEditorProps>) {
-  const [editor] = useState(() =>
-    withHistory(withReact(createEditor() as any))
-  );
+  const [editor] = useState(() => {
+    const e = withHistory(withReact(createEditor() as any));
+    const { isInline } = e;
+    e.isInline = (element: any) => {
+      return element.type === "link" ? true : isInline(element);
+    };
+    return e;
+  });
 
   const initialValue = useMemo(() => {
     try {

@@ -44,6 +44,14 @@ export function App() {
     });
   };
 
+  // Handler for AI Chat to update CV data
+  const handleUpdateCV = (updates: Partial<typeof data>) => {
+    setData((prevData) => ({
+      ...prevData,
+      ...updates,
+    }));
+  };
+
   return (
     <ThemeProvider>
       <SidebarProvider>
@@ -84,7 +92,11 @@ export function App() {
             {/* AI Chat Right Sidebar */}
             {isAiChatOpen && (
               <aside className="hidden lg:block fixed right-0 top-14 bottom-0 w-96 border-l bg-background shadow-2xl z-10 print:hidden">
-                <AiChat data={data} onClose={() => setIsAiChatOpen(false)} />
+                <AiChat
+                  data={data}
+                  onClose={() => setIsAiChatOpen(false)}
+                  onUpdateCV={handleUpdateCV}
+                />
               </aside>
             )}
           </div>
@@ -93,7 +105,11 @@ export function App() {
         {/* Mobile AI Chat Sheet - Only on small screens */}
         {isAiChatOpen && (
           <div className="lg:hidden fixed inset-0 z-50 bg-background">
-            <AiChat data={data} onClose={() => setIsAiChatOpen(false)} />
+            <AiChat
+              data={data}
+              onClose={() => setIsAiChatOpen(false)}
+              onUpdateCV={handleUpdateCV}
+            />
           </div>
         )}
 
