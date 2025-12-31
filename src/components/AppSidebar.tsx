@@ -24,6 +24,7 @@ import {
   Sparkles,
   ChevronRight,
   Plus,
+  MessageSquare,
 } from "lucide-react";
 import { ThemeToggle } from "./ui/ThemeToggle";
 import {
@@ -39,6 +40,8 @@ import { SummaryForm } from "./editor/SummaryForm";
 import { SectionEditor } from "./editor/SectionEditor";
 import type { CVData, CustomSection } from "../types";
 import { ExperienceForm } from "./editor/ExperienceForm";
+import { Sheet, SheetContent } from "./ui/sheet";
+import { AiChat } from "./AiChat";
 
 interface AppSidebarProps {
   readonly data: CVData;
@@ -55,6 +58,7 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
   const [isSummaryDialogOpen, setIsSummaryDialogOpen] = useState(false);
   const [isExperienceDialogOpen, setIsExperienceDialogOpen] = useState(false);
   const [activeSectionId, setActiveSectionId] = useState<string | null>(null);
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false);
   const { setOpenMobile, isMobile } = useSidebar();
 
   const closeSidebarOnInteract = () => {
@@ -209,6 +213,20 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
                     <span>Experience</span>
                   </SidebarMenuButton>
                 </SidebarMenuItem>
+
+                <SidebarMenuItem>
+                  <SidebarMenuButton
+                    tooltip="AI Assistant"
+                    onClick={() => {
+                      setIsAiChatOpen(true);
+                      closeSidebarOnInteract();
+                    }}
+                    className="text-orange-600 hover:text-orange-700 hover:bg-orange-50 dark:hover:bg-orange-900/20"
+                  >
+                    <MessageSquare />
+                    <span>AI Assistant</span>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
@@ -247,11 +265,11 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
         </SidebarContent>
         <SidebarFooter>
           <div className="text-xs">
-            <span className="opacity-70">Made with lazy by</span>{" "}
+            <span className="opacity-70">Made with 💤 by</span>{" "}
             <a
               href="https://underline.id/"
               target="_blank"
-              className="text-orange-600 hover:underline"
+              className="text-orange-600 underline"
             >
               Underline
             </a>
@@ -321,6 +339,12 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
           </div>
         </DialogApp>
       )}
+
+      <Sheet open={isAiChatOpen} onOpenChange={setIsAiChatOpen}>
+        <SheetContent side="right" className="p-0 sm:max-w-md">
+          <AiChat data={data} onClose={() => setIsAiChatOpen(false)} />
+        </SheetContent>
+      </Sheet>
     </>
   );
 }

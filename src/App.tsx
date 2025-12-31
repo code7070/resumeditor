@@ -13,7 +13,7 @@ import { Separator } from "./components/ui/separator";
 import { ConfirmDialog } from "./components/ui/ConfirmDialog";
 
 export function App() {
-  const { data, setData } = useCVData();
+  const { data, setData, undo, redo, save, canUndo, canRedo } = useCVData();
   const previewRef = useRef<HTMLDivElement>(null);
 
   const [deleteConfirm, setDeleteConfirm] = useState<{
@@ -55,7 +55,15 @@ export function App() {
             <Separator orientation="vertical" className="mr-2 h-4" />
             <div className="flex flex-1 items-center justify-between">
               <span className="font-semibold text-sm">Editor</span>
-              <EditorActions data={data} setData={setData} />
+              <EditorActions
+                data={data}
+                setData={setData}
+                undo={undo}
+                redo={redo}
+                save={save}
+                canUndo={canUndo}
+                canRedo={canRedo}
+              />
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:overflow-hidden print:p-0 print:block">

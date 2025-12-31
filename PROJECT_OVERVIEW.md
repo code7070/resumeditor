@@ -2,134 +2,86 @@
 
 ## 📋 Project Description
 
-**CV Builder** is a modern web application for creating and managing professional CV/Resumes. This application provides an interactive editor with real-time preview and is equipped with AI-powered features to enhance resume quality.
+**CV Builder** is a premium, modern web application designed for creating and managing high-quality professional resumes. It features a real-time interactive editor balanced with advanced AI-powered tools for content refinement, ATS (Applicant Tracking System) analysis, and automated PDF importing.
 
 ## 🎯 Main Objectives
 
-- Provide an easy-to-use platform for creating professional CVs
-- Deliver ATS (Applicant Tracking System) feedback to improve screening success rates
-- Assist users with AI to refine CV content
-- Support import and export in various formats
+- **Visual Excellence**: Professional CV layouts with real-time feedback.
+- **AI-Driven Success**: Leverage Gemini AI to optimize resume content and score.
+- **ATS Optimization**: Provide deep insights and visual feedback on how resumes perform against ATS standards.
+- **Seamless Data Flow**: Easy import from PDF and export to multiple professional formats.
 
 ## 🛠️ Tech Stack
 
-### Frontend
+### Frontend & Framework
 
-- **React 19.2.0** - UI library
-- **TypeScript** - Type safety
-- **Vite 7.2.4** - Build tool & dev server
-- **Tailwind CSS 4.1.18** - Styling framework
+- **React 19.2.0**: The latest React version for building a responsive and efficient UI.
+- **TypeScript**: Ensuring robust type safety across the codebase.
+- **Vite 7.2.4**: Next-generation frontend tooling for lightning-fast development.
+- **Tailwind CSS 4.1.18**: Modern styling with utility-first classes and built-in animations.
 
-### AI & Data Processing
+### AI & Signal Processing
 
-- **Google Generative AI (Gemini 2.5 Flash)** - AI content refinement & analysis
-- **PDF.js 3.11.174** - PDF parsing and import
-- **p5.js 2.1.2** - Generative art visualization
+- **Google Generative AI (Gemini 2.5 Flash)**: Powering multimodal resume parsing, text refinement, and deep ATS analysis.
+- **Slate.js**: A highly customizable framework for building rich text editors, used for professional summary and experience descriptions.
+- **PDF.js**: Specialized in high-fidelity PDF parsing and text extraction.
 
-### UI/UX Libraries
+### Data Visualization & UX
 
-- **Lucide React** - Icon library
-- **@hello-pangea/dnd** - Drag and drop functionality
-- **clsx & tailwind-merge** - Class name utilities
+- **p5.js 2.1.2**: Used for "Generative Analysis Art" to visualize CV resonance and data density.
+- **Recharts**: Provides clean, interactive charts for ATS score distribution and analytics.
+- **shadcn/ui**: Built on Radix UI and Lucide React for premium, accessible UI components.
+- **@hello-pangea/dnd**: Enabling intuitive drag-and-drop for section and item reordering.
 
-### Development Tools
+### Infrastructure & Operations
 
-- **ESLint** - Code linting
-- **Parcel** - Alternative bundler for production bundle
+- **Cloudflare Pages**: High-performance hosting with professional deployment workflows (Wrangler).
+- **Local Storage**: Automatic data persistence for a seamless "edit-and-return" experience.
 
 ---
 
 ## ✨ Main Features
 
-### 1. **Interactive Editor**
+### 1. **Premium Interactive Editor**
 
-- **Split View Layout**: Editor sidebar with real-time preview
-- **Dark Mode**: Dark and light themes with toggle
-- **Drag & Drop**: Reorder sections and items with drag-and-drop
-- **Font Format**: Choice of serif, sans-serif, or monospace fonts
+- **Split View Interface**: Simultaneous editing and high-fidelity preview.
+- **Modern Sidebar Management**: Centralized control for all CV sections using a persistent `AppSidebar`.
+- **Theme Support**: Seamless Dark/Light mode transitions with persistent preferences.
+- **Dynamic Formatting**: Switch between ATS-friendly fonts (Serif, Sans, Mono) instantly.
+- **Save & Undo History**: Robust undo/redo capabilities with manual save points and "Last saved" tracking for maximum data security.
 
-### 2. **Header & Contact Management**
+### 2. **Advanced Rich Text Editing**
 
-- Input for name, role/position, and address
-- Multiple contact links (Email, LinkedIn, GitHub, Portfolio, etc.)
-- Header alignment options (left, center, right)
-- Dynamic link management with add/remove functionality
+- **Slate.js Integration**: Full control over formatting with a minimalist WYSIWYG experience.
+- **Bullet Point Management**: Specialized controls for achievement-oriented bullet points.
+- **AI Refinement**: Contextualize and professionalize summaries with one-click AI assistance.
 
-### 3. **Professional Summary**
+### 3. **AI-Powered PDF Import (Resume Scan)**
 
-- Editor for professional summary
-- **AI Text Refinement**: Uses Gemini AI to refine summary text for more professional and impactful content
+- **Multimodal Extraction**: Uses Gemini Vision and PDF.js to accurately map PDF content to structured data.
+- **Smart Mapping**: Automatically detects Work Experience, Education, and Skills from legacy resumes.
+- **Consent-First Design**: Secure and transparent AI processing with user consent dialogs.
 
-### 4. **Experience Section**
+### 4. **Deep ATS Analysis Dashboard**
 
-- Manage multiple work experiences
-- Each experience includes:
-  - Job title
-  - Year/duration
-  - Description
-  - Bullet points for achievements
-- Drag & drop to reorder experiences and bullet points
+- **Generative Signal Art**: Real-time p5.js visualization of "Narrative Signal" and "Spectral Density."
+- **Score Analytics**: Recharts-powered breakdown of CV performance scores.
+- **Actionable Feedback**: Specific suggestions for strengths, improvements, and missing keywords.
+- **History Tracking**: Compare scores across multiple iterations to measure improvement.
 
-### 5. **Custom Sections**
+### 5. **Flexible Section Architecture**
 
-- Create unlimited custom sections (Education, Skills, Projects, Certifications, etc.)
-- Each section can have multiple items
-- Flexible structure: title, description, year for each item
-- Rename, add, remove sections as needed
+- **Core Sections**: Dedicated modules for Header (Contacts/Links), Summary, and Experience.
+- **Custom Section Builder**: Create unlimited customized modules (Skills, Certifications, Projects, etc.).
+- **Dialog-Based Editing**: Focused editing experience for complex sections via `SectionEditor`.
 
-### 6. **ATS Analysis & Scoring**
+### 6. **Professional Export Engine**
 
-Comprehensive ATS analysis features:
-
-- **ATS Score (0-100)**: Overall CV evaluation against ATS standards
-- **Strengths**: List of CV strengths
-- **Improvements**: Specific improvement suggestions
-- **Missing Keywords**: Important keywords that might be missing
-- **Formatting Feedback**: Feedback on CV format
-
-**ATS Visual Dashboard**:
-
-- Generative art visualization using p5.js
-- Dual canvas display:
-  - **Narrative Signal**: Visualization of CV data resonance
-  - **Spectral Density**: Visualization of score distribution
-- Score breakdown with categorization (Excellent, Good, Fair, Needs Work, Critical)
-- Detailed analysis cards for each category
-- History tracking for multiple ATS scans
-
-**ATS Rule-Set**:
-
-- Comprehensive ATS guidelines embedded in the system
-- Covers format, content, keywords, and best practices
-- Used as reference for AI analysis
-
-### 7. **PDF Import**
-
-- **AI-Powered PDF Parsing**: Upload PDF resume and automatically extract data
-- Consent dialog for AI processing
-- Structured data extraction:
-  - Header information
-  - Professional summary
-  - Work experience with bullet points
-  - Custom sections (Education, Skills, etc.)
-- Preserves structure and formatting from original PDF
-
-### 8. **Export & Sharing**
-
-Multiple export formats:
-
-- **JSON**: Export/import CV data for backup or transfer
-- **Markdown (.md)**: Export to markdown format
-- **LaTeX (.tex)**: Export for academic CV formatting
-- **Print/PDF**: Print directly to PDF using browser print dialog
-
-### 9. **UI/UX Features**
-
-- **Responsive Design**: Mobile-friendly layout
-- **Confirmation Dialogs**: Protection from accidental deletions
-- **Loading States**: Visual feedback for AI operations
-- **Error Handling**: Graceful error messages
-- **Print Optimized**: Print stylesheet for clean PDF output
+- **Native Print-to-PDF**: Optimized CSS ensures pixel-perfect PDF export via browser print dialog.
+- **Multi-Format Export**:
+  - **JSON**: Portable data backups.
+  - **Markdown**: For developers and documentation-style resumes.
+  - **LaTeX**: High-quality academic and technical formatting.
 
 ---
 
@@ -139,256 +91,39 @@ Multiple export formats:
 cv-builder/
 ├── src/
 │   ├── components/
-│   │   ├── Editor.tsx              # Main editor component
-│   │   ├── Preview.tsx             # CV preview component
-│   │   ├── ATSAnalysisArt.tsx      # ATS visualization with p5.js
 │   │   ├── editor/
-│   │   │   ├── HeaderForm.tsx      # Form for header section
-│   │   │   ├── ExperienceForm.tsx  # Form for experience section
-│   │   │   └── SectionsForm.tsx    # Form for custom sections
-│   │   └── ui/
-│   │       ├── Dialog.tsx          # Reusable dialog component
-│   │       ├── ConfirmDialog.tsx   # Confirmation dialog
-│   │       └── ThemeToggle.tsx     # Dark mode toggle
-│   ├── context/
-│   │   └── ThemeContext.tsx        # Theme management context
+│   │   │   ├── RichTextEditor.tsx  # Slate.js based editor core
+│   │   │   ├── SectionEditor.tsx   # Dialog-based section manager
+│   │   │   └── SummaryForm.tsx     # AI-integrated summary module
+│   │   ├── ATSAnalysisArt.tsx      # p5.js visualization engine
+│   │   ├── AppSidebar.tsx          # Main navigation and section control
+│   │   └── Preview.tsx             # Real-time resume renderer
 │   ├── services/
-│   │   ├── gemini.ts               # Gemini AI integration
-│   │   └── ats-rule-set.md         # ATS guidelines documentation
-│   ├── hooks/
-│   │   └── useCVData.ts            # Custom hook for CV data management
+│   │   ├── gemini.ts               # Gemini 2.5 Flash API integration
+│   │   └── ats-rule-set.md         # Embedded ATS logic knowledge base
 │   ├── utils/
-│   │   ├── exporters.ts            # Export utilities (JSON, MD, LaTeX)
-│   │   ├── darkModeClasses.ts      # Dark mode utility classes
-│   │   └── editorDarkModeGuide.ts  # Dark mode styling guide
-│   ├── types.ts                    # TypeScript type definitions
-│   ├── App.tsx                     # Main app component
-│   └── main.tsx                    # Entry point
-├── public/                         # Static assets
-├── index.html                      # HTML template
-└── vite.config.ts                  # Vite configuration
+│   │   └── exporters.ts            # JSON, MD, LaTeX, and Print logic
+│   └── types.ts                    # Core CVData and UI type definitions
+├── wrangler.jsonc                  # Cloudflare Pages configuration
+└── vite.config.ts                  # Optimized build pipeline
 ```
 
 ---
 
-## 🔑 Key Components
+## 🚀 Setup & Development
 
-### Editor.tsx
+### Local Setup
 
-Main editor component that manages:
+1. Clone the repository and install dependencies: `pnpm install`.
+2. Configure `.env` with `VITE_GEMINI_API_KEY`.
+3. Start the development server: `pnpm dev`.
 
-- State management for UI (dialogs, loading states)
-- AI operations (text refinement, ATS analysis, PDF parsing)
-- File import/export handlers
-- ATS history tracking
-- Integration with all sub-forms
+### Deployment
 
-### Services (gemini.ts)
+The project is optimized for **Cloudflare Pages**. Deployments are managed via Wrangler:
 
-AI service layer that provides:
-
-- `refineText()`: AI text refinement for professional writing
-- `parseResumeFromPdf()`: Extract structured data from PDF with Gemini Vision
-- `analyzeATSScore()`: Comprehensive ATS analysis with structured output
-
-### ATSAnalysisArt.tsx
-
-Generative art visualization for ATS results:
-
-- Uses p5.js for dual canvas rendering
-- Dynamic color mapping based on score
-- Interactive score breakdown
-- History navigation
-
----
-
-## 🎨 Design System
-
-### Color Palette
-
-- **Light Mode**: Gray-100 background, white cards
-- **Dark Mode**: Gray-950 background, gray-900 cards
-- **Accent Colors**: Indigo for primary actions
-- **Status Colors**: Green (success), red (error), yellow (warning)
-
-### Typography
-
-- **Font Options**: Serif, Sans-serif, Monospace
-- **Responsive Sizing**: Adaptive for mobile/desktop
-- **Print Optimized**: Clean typography for PDF export
-
-### Dark Mode
-
-- System-wide dark mode support
-- Persistent theme preference
-- Smooth transitions
-- Print always uses light theme
-
----
-
-## 🚀 Setup & Installation
-
-### Prerequisites
-
-- **Node.js** (v18 or higher)
-- **pnpm** (package manager)
-
-### Environment Variables
-
-```
-VITE_GEMINI_API_KEY=your_gemini_api_key_here
-```
-
-### Installation
-
-```bash
-# Install dependencies
-pnpm install
-
-# Run development server
-pnpm dev
-
-# Build for production
-pnpm build
-
-# Preview production build
-pnpm preview
-```
-
----
-
-## 🔐 API Integration
-
-### Google Generative AI (Gemini)
-
-- **Model**: gemini-2.5-flash
-- **Features Used**:
-  - Text generation for content refinement
-  - Multimodal input (PDF + text) for resume parsing
-  - Structured output with JSON schema
-  - Response schema validation
-
-### API Safety
-
-- API key stored in environment variables
-- Error handling for API failures
-- User consent dialogs for AI operations
-
----
-
-## 📊 Data Model
-
-### CVData Interface
-
-```typescript
-interface CVData {
-  header: {
-    name: string;
-    role: string;
-    address: string;
-    align: "left" | "center" | "right";
-    links: Link[];
-  };
-  summary: string;
-  experience: ExperienceItem[];
-  customSections: CustomSection[];
-  font: "serif" | "sans" | "mono";
-}
-```
-
-### Local Storage
-
-- CV data automatically saved to localStorage
-- Persistence across sessions
-- Import/export for backup
-
----
-
-## 🎯 User Workflows
-
-### 1. Create New CV
-
-1. Open application → Default template loads
-2. Edit header information
-3. Update professional summary (optional: use AI refinement)
-4. Add work experiences with drag-drop for ordering
-5. Add custom sections (Education, Skills, etc.)
-6. Preview in real-time on right pane
-7. Export or print
-
-### 2. Import Existing Resume
-
-1. Click Import PDF button
-2. Accept AI processing consent
-3. Select PDF file
-4. AI extracts data automatically
-5. Review and edit extracted data
-6. Continue editing
-
-### 3. ATS Analysis
-
-1. Complete CV data
-2. Click "Analyze ATS Score"
-3. Accept ATS analysis consent
-4. View comprehensive analysis with visual dashboard
-5. Review improvements and apply suggestions
-6. Re-analyze to track improvements
-
----
-
-## 🔮 Future Enhancements
-
-Potential improvements that could be added:
-
-- Multiple CV templates/layouts
-- Real-time collaboration
-- Cloud storage integration
-- More export formats (HTML, DOCX)
-- AI-powered keyword suggestions
-- Job description matching
-- Cover letter generator
-- Multi-language support
-- Version control for CV history
-
----
-
-## 📝 License & Credits
-
-### Dependencies
-
-- React, TypeScript, Vite (MIT License)
-- Tailwind CSS (MIT License)
-- Google Generative AI SDK
-- PDF.js (Apache 2.0)
-- p5.js (LGPL 2.1)
-
-### Development
-
-- Built with modern web technologies
-- Follows React & TypeScript best practices
-- Responsive & accessible design principles
-
----
-
-## 🤝 Contributing
-
-This project can be further developed with:
-
-- Bug fixes and improvements
-- New features and integrations
-- UI/UX enhancements
-- Documentation updates
-- Testing coverage
-
----
-
-## 📞 Support
-
-For questions or issues:
-
-- Check code for implementation details
-- Review ATS rule-set documentation
-- Consult Gemini AI documentation for API usage
+- Build: `pnpm build`
+- Deploy: `npx wrangler pages deploy dist`
 
 ---
 

@@ -39,6 +39,7 @@ export interface CVData {
   experience: ExperienceItem[];
   customSections: CustomSection[];
   font: "serif" | "sans" | "mono";
+  lastSaved?: string;
 }
 
 export const initialCVData: CVData = {

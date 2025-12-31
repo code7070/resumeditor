@@ -291,3 +291,82 @@ export async function analyzeATSScore(
     throw e;
   }
 }
+
+export async function chatWithGemini(
+  messages: { role: "user" | "model"; content: string }[],
+  data: Partial<CVData>,
+  selectedContexts: string[]
+): Promise<string> {
+  if (!API_KEY) throw new Error("Missing VITE_GEMINI_API_KEY");
+
+  let contextParts: string[] = [];
+
+  if (selectedContexts.includes("full")) {
+    contextParts.push(`FULL_CV_DATA:\n${JSON.stringify(data, null, 2)}`);
+  } else {
+    if (selectedContexts.includes("summary")) {
+      contextParts.push(`PROFESSIONAL_SUMMARY:\n${data.summary}`);
+    }
+    if (selectedContexts.includes("experience")) {
+      contextParts.push(
+        `WORK_EXPERIENCE:\n${JSON.stringify(data.experience, null, 2)}`
+      );
+    }
+    // Custom sections
+    data.customSections?.forEach((section) => {
+      if (selectedContexts.includes(section.id)) {
+        contextParts.push(
+          `SECTION_${section.name.toUpperCase()}:\n${JSON.stringify(
+            section.items,
+            null,
+            2
+          )}`
+        );
+      }
+    });
+  }
+
+  const specificContext = contextParts.join("\n\n---\n\n");
+
+  const systemPrompt = `
+    You are an expert CV assistant. You have access to the following context from the user's CV:
+    
+    SELECTED_CONTEXTS: ${selectedContexts.join(", ")}
+    
+    CONTEXT_DATA:
+    ${specificContext}
+    
+    Answer the user's questions based on this specific context. Be professional, concise, and helpful. 
+    If you are suggesting changes, explain why they are better for a professional resume.
+  `;
+
+  try {
+    const response = await client.models.generateContent({
+      model: "gemini-1.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: systemPrompt }],
+        },
+        {
+          role: "model",
+          parts: [
+            {
+              text: "Understood. I'm ready to help you with your CV based on the context provided. How can I assist you today?",
+            },
+          ],
+        },
+        ...messages.map((m) => ({
+          role: m.role,
+          parts: [{ text: m.content }],
+        })),
+      ],
+    });
+
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+    return text || "I'm sorry, I couldn't generate a response.";
+  } catch (e) {
+    console.error("Gemini Chat Error:", e);
+    throw e;
+  }
+}

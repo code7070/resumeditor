@@ -10,7 +10,12 @@ import {
   FileCode,
   Check,
 } from "lucide-react";
-import { DialogApp } from "../../ui/DialogApp";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "../../ui/Dialog";
 
 interface ExportActionProps {
   data: CVData;
@@ -53,119 +58,120 @@ export function ExportAction({ data }: ExportActionProps) {
     <>
       <button
         onClick={() => setShowExportDialog(true)}
-        className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs font-medium border border-gray-200 dark:border-gray-700"
+        className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs font-medium border border-gray-200 dark:border-gray-700 w-full"
       >
-        <Share2 size={14} /> <span className="hidden md:inline">Export</span>
+        <Share2 size={14} /> Export
       </button>
 
       {/* Export Dialog */}
-      <DialogApp
-        isOpen={showExportDialog}
-        onClose={() => setShowExportDialog(false)}
-        title="Export Resume"
-      >
-        <div className="space-y-2">
-          <button
-            onClick={handleExportPDF}
-            className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 hover:from-emerald-100 hover:to-emerald-200 rounded-lg transition-colors group text-left border border-emerald-200"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white rounded-md shadow-sm text-emerald-700 ring-1 ring-emerald-200">
-                <Printer size={20} />
+      <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>Export Resume</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-2">
+            <button
+              onClick={handleExportPDF}
+              className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 hover:from-emerald-100 hover:to-emerald-200 rounded-lg transition-colors group text-left border border-emerald-200"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white rounded-md shadow-sm text-emerald-700 ring-1 ring-emerald-200">
+                  <Printer size={20} />
+                </div>
+                <div>
+                  <span className="block text-sm font-semibold text-gray-900">
+                    Print / Save as PDF
+                  </span>
+                  <span className="block text-xs text-gray-600">
+                    Use system dialog to save as PDF
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="block text-sm font-semibold text-gray-900">
-                  Print / Save as PDF
-                </span>
-                <span className="block text-xs text-gray-600">
-                  Use system dialog to save as PDF
-                </span>
-              </div>
-            </div>
-            <Download
-              size={16}
-              className="text-emerald-600 group-hover:text-emerald-700 transition-colors"
-            />
-          </button>
-
-          <button
-            onClick={() => handleExport("json")}
-            className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white rounded-md shadow-sm text-amber-700 ring-1 ring-gray-100">
-                <FileJson size={20} />
-              </div>
-              <div>
-                <span className="block text-sm font-semibold text-gray-900">
-                  Download JSON
-                </span>
-                <span className="block text-xs text-gray-500">
-                  Save a backup of your data
-                </span>
-              </div>
-            </div>
-            <Download
-              size={16}
-              className="text-gray-400 group-hover:text-amber-700 transition-colors"
-            />
-          </button>
-
-          <button
-            onClick={() => handleExport("md")}
-            className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white rounded-md shadow-sm text-blue-700 ring-1 ring-gray-100">
-                <FileText size={20} />
-              </div>
-              <div>
-                <span className="block text-sm font-semibold text-gray-900">
-                  Copy Metadata
-                </span>
-                <span className="block text-xs text-gray-500">
-                  Copy as Markdown format
-                </span>
-              </div>
-            </div>
-            {copyStatus === "md" ? (
-              <Check size={16} className="text-emerald-600" />
-            ) : (
               <Download
                 size={16}
-                className="text-gray-400 group-hover:text-blue-700 transition-colors"
+                className="text-emerald-600 group-hover:text-emerald-700 transition-colors"
               />
-            )}
-          </button>
+            </button>
 
-          <button
-            onClick={() => handleExport("tex")}
-            className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
-          >
-            <div className="flex items-center gap-3">
-              <div className="p-2 bg-white rounded-md shadow-sm text-emerald-700 ring-1 ring-gray-100">
-                <FileCode size={20} />
+            <button
+              onClick={() => handleExport("json")}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white rounded-md shadow-sm text-amber-700 ring-1 ring-gray-100">
+                  <FileJson size={20} />
+                </div>
+                <div>
+                  <span className="block text-sm font-semibold text-gray-900">
+                    Download JSON
+                  </span>
+                  <span className="block text-xs text-gray-500">
+                    Save a backup of your data
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="block text-sm font-semibold text-gray-900">
-                  Copy LaTeX
-                </span>
-                <span className="block text-xs text-gray-500">
-                  Copy as LaTeX format
-                </span>
-              </div>
-            </div>
-            {copyStatus === "tex" ? (
-              <Check size={16} className="text-emerald-600" />
-            ) : (
               <Download
                 size={16}
-                className="text-gray-400 group-hover:text-emerald-700 transition-colors"
+                className="text-gray-400 group-hover:text-amber-700 transition-colors"
               />
-            )}
-          </button>
-        </div>
-      </DialogApp>
+            </button>
+
+            <button
+              onClick={() => handleExport("md")}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white rounded-md shadow-sm text-blue-700 ring-1 ring-gray-100">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <span className="block text-sm font-semibold text-gray-900">
+                    Copy Metadata
+                  </span>
+                  <span className="block text-xs text-gray-500">
+                    Copy as Markdown format
+                  </span>
+                </div>
+              </div>
+              {copyStatus === "md" ? (
+                <Check size={16} className="text-emerald-600" />
+              ) : (
+                <Download
+                  size={16}
+                  className="text-gray-400 group-hover:text-blue-700 transition-colors"
+                />
+              )}
+            </button>
+
+            <button
+              onClick={() => handleExport("tex")}
+              className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
+            >
+              <div className="flex items-center gap-3">
+                <div className="p-2 bg-white rounded-md shadow-sm text-emerald-700 ring-1 ring-gray-100">
+                  <FileCode size={20} />
+                </div>
+                <div>
+                  <span className="block text-sm font-semibold text-gray-900">
+                    Copy LaTeX
+                  </span>
+                  <span className="block text-xs text-gray-500">
+                    Copy as LaTeX format
+                  </span>
+                </div>
+              </div>
+              {copyStatus === "tex" ? (
+                <Check size={16} className="text-emerald-600" />
+              ) : (
+                <Download
+                  size={16}
+                  className="text-gray-400 group-hover:text-emerald-700 transition-colors"
+                />
+              )}
+            </button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }
