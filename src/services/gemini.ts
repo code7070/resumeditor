@@ -329,20 +329,24 @@ export async function chatWithGemini(
   const specificContext = contextParts.join("\n\n---\n\n");
 
   const systemPrompt = `
-    You are an expert CV assistant. You have access to the following context from the user's CV:
+    You are a concise CV optimization expert. Analyze the provided CV context and give SHORT, ACTIONABLE advice.
     
     SELECTED_CONTEXTS: ${selectedContexts.join(", ")}
-    
     CONTEXT_DATA:
     ${specificContext}
     
-    Answer the user's questions based on this specific context. Be professional, concise, and helpful. 
-    If you are suggesting changes, explain why they are better for a professional resume.
+    RULES:
+    - Keep responses brief and to-the-point (2-4 sentences max unless asked for details)
+    - Use bullet points for multiple suggestions
+    - Focus on actionable improvements, not general praise
+    - Prioritize impact: what changes will make the biggest difference?
+    - Use markdown formatting for clarity
+    - If suggesting changes, explain WHY in one sentence
   `;
 
   try {
     const response = await client.models.generateContent({
-      model: "gemini-1.5-flash",
+      model: "gemini-2.5-flash",
       contents: [
         {
           role: "user",

@@ -8,17 +8,25 @@ import {
   FileText,
   Briefcase,
   Layers,
+  Check,
+  Trash2,
+  X,
+  MessageCircleX,
 } from "lucide-react";
 import { Button } from "./ui/button";
-import { Input } from "./ui/input";
+import { Textarea } from "./ui/textarea";
 import { ScrollArea, ScrollBar } from "./ui/scroll-area";
 import { chatWithGemini } from "../services/gemini";
 import type { CVData } from "../types";
 import { cn } from "@/lib/utils";
+import { Scrollbar } from "@radix-ui/react-scroll-area";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 interface Message {
   role: "user" | "model";
   content: string;
+  contexts?: string[];
 }
 
 interface AiChatProps {
@@ -26,13 +34,32 @@ interface AiChatProps {
   readonly onClose?: () => void;
 }
 
+const STORAGE_KEY = "ai-chat-history";
+
 export function AiChat({ data, onClose }: AiChatProps) {
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [messages, setMessages] = useState<Message[]>(() => {
+    // Load from localStorage on mount
+    try {
+      const saved = localStorage.getItem(STORAGE_KEY);
+      return saved ? JSON.parse(saved) : [];
+    } catch {
+      return [];
+    }
+  });
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedContexts, setSelectedContexts] = useState<string[]>(["full"]);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Save to localStorage whenever messages change
+  useEffect(() => {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(messages));
+    } catch (error) {
+      console.error("Failed to save chat history:", error);
+    }
+  }, [messages]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -58,10 +85,21 @@ export function AiChat({ data, onClose }: AiChatProps) {
     });
   };
 
+  const handleClearHistory = () => {
+    if (confirm("Are you sure you want to clear all chat history?")) {
+      setMessages([]);
+      localStorage.removeItem(STORAGE_KEY);
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
-    const userMessage: Message = { role: "user", content: input };
+    const userMessage: Message = {
+      role: "user",
+      content: input,
+      contexts: [...selectedContexts],
+    };
     setMessages((prev) => [...prev, userMessage]);
     setInput("");
     setIsLoading(true);
@@ -102,21 +140,34 @@ export function AiChat({ data, onClose }: AiChatProps) {
             </p>
           </div>
         </div>
-        {onClose && (
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={onClose}
-            className="h-8 w-8 text-muted-foreground"
-          >
-            <Layout className="size-4" />
-          </Button>
-        )}
+        <div className="flex items-center gap-1">
+          {messages.length > 0 && (
+            <Button
+              variant="secondary"
+              size="icon"
+              onClick={handleClearHistory}
+              className="h-8 w-8 text-destructive hover:bg-destructive hover:text-white"
+              title="Clear chat history"
+            >
+              <MessageCircleX className="size-4" />
+            </Button>
+          )}
+          {onClose && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={onClose}
+              className="h-8 w-8 text-muted-foreground"
+            >
+              <Layout className="size-4" />
+            </Button>
+          )}
+        </div>
       </div>
 
       {/* Chat History */}
-      <ScrollArea className="flex-1 p-4">
-        <div className="space-y-4 pb-4">
+      <ScrollArea className="flex-1 p-4 max-h-[calc(100vh-68px-181px)] md:max-h-[calc(100vh-56px-68px-180px)]">
+        <div className="space-y-4">
           {messages.length === 0 && (
             <div className="text-center py-10 space-y-4">
               <div className="size-12 bg-orange-100 dark:bg-orange-950 rounded-full flex items-center justify-center mx-auto text-orange-600">
@@ -162,9 +213,35 @@ export function AiChat({ data, onClose }: AiChatProps) {
                     : "bg-muted/80 backdrop-blur-sm rounded-tl-none border border-gray-100 dark:border-gray-800"
                 )}
               >
-                <p className="leading-relaxed whitespace-pre-wrap">
-                  {m.content}
-                </p>
+                {m.role === "user" ? (
+                  <>
+                    {m.contexts && m.contexts.length > 0 && (
+                      <div className="flex flex-wrap gap-1 mb-2 pb-2 border-b border-primary-foreground/20">
+                        {m.contexts.map((ctx) => {
+                          const label = getContextLabel(ctx, data);
+                          return (
+                            <span
+                              key={ctx}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary-foreground/10 rounded-full text-[10px] font-medium"
+                            >
+                              {label.icon}
+                              {label.text}
+                            </span>
+                          );
+                        })}
+                      </div>
+                    )}
+                    <p className="leading-relaxed whitespace-pre-wrap">
+                      {m.content}
+                    </p>
+                  </>
+                ) : (
+                  <div className="prose prose-sm dark:prose-invert max-w-none prose-p:leading-relaxed prose-pre:bg-gray-900 prose-pre:text-gray-100 prose-code:text-orange-600 dark:prose-code:text-orange-400 prose-headings:mb-2 prose-headings:mt-3 prose-p:my-1 prose-ul:my-1 prose-ol:my-1 prose-li:my-0">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {m.content}
+                    </ReactMarkdown>
+                  </div>
+                )}
               </div>
             </div>
           ))}
@@ -183,6 +260,7 @@ export function AiChat({ data, onClose }: AiChatProps) {
           )}
           <div ref={messagesEndRef} />
         </div>
+        <Scrollbar orientation="vertical" />
       </ScrollArea>
 
       {/* Input Area */}
@@ -225,24 +303,34 @@ export function AiChat({ data, onClose }: AiChatProps) {
                 />
               ))}
             </div>
-            <ScrollBar orientation="horizontal" />
+            <ScrollBar
+              orientation="horizontal"
+              className="bg-transparent hidden"
+            />
           </ScrollArea>
         </div>
 
         <form
-          className="flex items-center gap-2"
+          className="flex items-end gap-2"
           onSubmit={(e) => {
             e.preventDefault();
             handleSend();
           }}
         >
           <div className="relative flex-1 group">
-            <Input
+            <Textarea
               value={input}
               onChange={(e) => setInput(e.target.value)}
-              placeholder="Type your message..."
-              className="pr-10 bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 h-10 rounded-xl focus-visible:ring-orange-600 transition-all shadow-sm"
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && !e.shiftKey) {
+                  e.preventDefault();
+                  handleSend();
+                }
+              }}
+              placeholder="Type your message... (Shift+Enter for new line)"
+              className="min-h-[40px] max-h-[120px] resize-none bg-white dark:bg-gray-950 border-gray-200 dark:border-gray-800 rounded-xl focus-visible:ring-orange-600 transition-all shadow-sm py-2.5 px-3"
               disabled={isLoading}
+              rows={1}
             />
           </div>
           <Button
@@ -280,13 +368,29 @@ function ContextPill({
           : "bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-gray-500 dark:text-gray-400 hover:border-orange-200 dark:hover:border-orange-900/40"
       )}
     >
-      {icon}
+      {active ? <Check size={14} /> : icon}
       <span>{label}</span>
-      {active && (
-        <div className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/20 rounded-sm p-0.5">
-          <div className="size-1.5 border-b-2 border-r-2 border-white rotate-45 -mt-0.5" />
-        </div>
-      )}
     </button>
   );
+}
+
+function getContextLabel(
+  contextId: string,
+  data: CVData
+): { icon: React.ReactNode; text: string } {
+  if (contextId === "full") {
+    return { icon: <Layout className="size-3" />, text: "Full CV" };
+  }
+  if (contextId === "summary") {
+    return { icon: <FileText className="size-3" />, text: "Summary" };
+  }
+  if (contextId === "experience") {
+    return { icon: <Briefcase className="size-3" />, text: "Experience" };
+  }
+  // Custom section
+  const section = data.customSections.find((s) => s.id === contextId);
+  return {
+    icon: <Layers className="size-3" />,
+    text: section?.name || "Custom Section",
+  };
 }

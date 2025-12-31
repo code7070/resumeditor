@@ -2,7 +2,14 @@ import type { CVData } from "../../types";
 import { ImportAction } from "./actions/ImportAction";
 import { ExportAction } from "./actions/ExportAction";
 import { ScannerAction } from "./actions/ScannerAction";
-import { Undo2, Redo2, Save, MoreHorizontal } from "lucide-react";
+import {
+  Undo2,
+  Redo2,
+  Save,
+  MoreHorizontal,
+  MessageSquare,
+  X,
+} from "lucide-react";
 import { formatRelative } from "date-fns";
 import {
   DropdownMenu,
@@ -21,6 +28,8 @@ interface EditorActionsProps {
   save: () => void;
   canUndo: boolean;
   canRedo: boolean;
+  isAiChatOpen: boolean;
+  setIsAiChatOpen: (open: boolean) => void;
 }
 
 export function EditorActions({
@@ -31,6 +40,8 @@ export function EditorActions({
   save,
   canUndo,
   canRedo,
+  isAiChatOpen,
+  setIsAiChatOpen,
 }: Readonly<EditorActionsProps>) {
   const formatted = formatRelative(new Date(data.lastSaved || ""), new Date());
 
@@ -69,6 +80,25 @@ export function EditorActions({
       >
         <Save size={14} className="sm:size-4" />
         <span>Save</span>
+      </button>
+
+      {/* AI Assistant Button */}
+      <button
+        onClick={() => setIsAiChatOpen(!isAiChatOpen)}
+        className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-all font-semibold text-xs shadow-sm hover:shadow active:scale-95 ${
+          isAiChatOpen
+            ? "bg-orange-700 text-white"
+            : "bg-orange-600 text-white hover:bg-orange-700"
+        }`}
+      >
+        {isAiChatOpen ? (
+          <X size={14} className="sm:size-4" />
+        ) : (
+          <MessageSquare size={14} className="sm:size-4" />
+        )}
+        <span className="hidden sm:inline">
+          {isAiChatOpen ? "Close" : ""} AI {isAiChatOpen ? "" : "Assistant"}
+        </span>
       </button>
 
       {/* Secondary Actions Dropdown */}

@@ -11,6 +11,7 @@ import {
 import { AppSidebar } from "./components/AppSidebar";
 import { Separator } from "./components/ui/separator";
 import { ConfirmDialog } from "./components/ui/ConfirmDialog";
+import { AiChat } from "./components/AiChat";
 
 export function App() {
   const { data, setData, undo, redo, save, canUndo, canRedo } = useCVData();
@@ -27,6 +28,8 @@ export function App() {
     message: "",
     onConfirm: () => {},
   });
+
+  const [isAiChatOpen, setIsAiChatOpen] = useState(false);
 
   const confirmDelete = (
     title: string,
@@ -63,24 +66,36 @@ export function App() {
                 save={save}
                 canUndo={canUndo}
                 canRedo={canRedo}
+                isAiChatOpen={isAiChatOpen}
+                setIsAiChatOpen={setIsAiChatOpen}
               />
             </div>
           </header>
           <div className="flex flex-1 flex-col gap-4 lg:flex-row lg:overflow-hidden print:p-0 print:block">
-            {/* Editor Column */}
-            {/* <div className="flex-1 overflow-y-auto rounded-xl border bg-background shadow-sm lg:max-w-lg print:hidden">
-              <Editor
-                data={data}
-                setData={setData}
-                confirmDelete={confirmDelete}
-              />
-            </div> */}
             {/* Preview Column */}
-            <main className="flex-1 overflow-y-auto bg-muted/20 p-4 print:border-none print:p-0 print:overflow-visible">
+            <main
+              className={`flex-1 overflow-y-auto bg-muted/20 p-4 print:border-none print:p-0 print:overflow-visible transition-all ${
+                isAiChatOpen ? "lg:mr-96" : ""
+              }`}
+            >
               <Preview ref={previewRef} data={data} />
             </main>
+
+            {/* AI Chat Right Sidebar */}
+            {isAiChatOpen && (
+              <aside className="hidden lg:block fixed right-0 top-14 bottom-0 w-96 border-l bg-background shadow-2xl z-10 print:hidden">
+                <AiChat data={data} onClose={() => setIsAiChatOpen(false)} />
+              </aside>
+            )}
           </div>
         </SidebarInset>
+
+        {/* Mobile AI Chat Sheet - Only on small screens */}
+        {isAiChatOpen && (
+          <div className="lg:hidden fixed inset-0 z-50 bg-background">
+            <AiChat data={data} onClose={() => setIsAiChatOpen(false)} />
+          </div>
+        )}
 
         <ConfirmDialog
           isOpen={deleteConfirm.isOpen}
