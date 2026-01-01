@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { trackEvent } from "../../../lib/utils";
 import type { CVData } from "../../../types";
 import {
@@ -27,11 +27,19 @@ interface ATSHistoryItem {
   result: ATSAnalysisResult;
 }
 
-interface ScannerActionProps {
-  data: CVData;
+export interface ScannerActionHandle {
+  open: () => void;
 }
 
-export function ScannerAction({ data }: Readonly<ScannerActionProps>) {
+interface ScannerActionProps {
+  data: CVData;
+  hideTrigger?: boolean;
+}
+
+export const ScannerAction = forwardRef<
+  ScannerActionHandle,
+  ScannerActionProps
+>(({ data, hideTrigger = false }, ref) => {
   const [showATSDialog, setShowATSDialog] = useState(false);
   const [showConsentDialog, setShowConsentDialog] = useState(false);
   const [isAnalyzingATS, setIsAnalyzingATS] = useState(false);
@@ -108,24 +116,30 @@ export function ScannerAction({ data }: Readonly<ScannerActionProps>) {
     }
   };
 
+  useImperativeHandle(ref, () => ({
+    open: openATSDialog,
+  }));
+
   return (
     <>
-      <button
-        onClick={openATSDialog}
-        className="group flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-xs font-semibold border border-blue-200 dark:border-blue-800 w-full"
-      >
-        <div className="relative size-[16px] overflow-hidden">
-          <ShieldCheck
-            size={14}
-            className="transition-all group-hover:-translate-y-full"
-          />
-          <SparklesIcon
-            size={14}
-            className="transition-all group-hover:-translate-y-full"
-          />
-        </div>
-        Scanner ATS
-      </button>
+      {!hideTrigger && (
+        <button
+          onClick={openATSDialog}
+          className="group flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-xs font-semibold border border-blue-200 dark:border-blue-800 w-full"
+        >
+          <div className="relative size-[16px] overflow-hidden">
+            <ShieldCheck
+              size={14}
+              className="transition-all group-hover:-translate-y-full"
+            />
+            <SparklesIcon
+              size={14}
+              className="transition-all group-hover:-translate-y-full"
+            />
+          </div>
+          Scanner ATS
+        </button>
+      )}
 
       {/* ATS Result Dialog */}
       <Dialog
@@ -291,4 +305,5 @@ export function ScannerAction({ data }: Readonly<ScannerActionProps>) {
       />
     </>
   );
-}
+});
+ScannerAction.displayName = "ScannerAction";

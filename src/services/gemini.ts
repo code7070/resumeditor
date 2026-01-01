@@ -219,6 +219,64 @@ export interface ATSAnalysisResult {
   formattingFeedback: string[];
 }
 
+// Helper to strip HTML tags
+function stripHtml(html: string): string {
+  if (!html) return "";
+  const tmp = document.createElement("DIV");
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || "";
+}
+
+// Helper to get font name
+function getFontName(font: string): string {
+  switch (font) {
+    case "serif":
+      return '"Times New Roman", Times, serif';
+    case "sans":
+      return "Arial, Helvetica, sans-serif";
+    case "mono":
+      return '"Courier New", Courier, monospace';
+    default:
+      return font;
+  }
+}
+
+function cleanCVDataForATS(data: CVData): any {
+  const clean = JSON.parse(JSON.stringify(data)); // Deep clone
+
+  // Map font
+  clean.font = getFontName(data.font);
+
+  // Strip HTML from text fields
+  if (clean.summary) {
+    clean.summary = stripHtml(clean.summary);
+  }
+
+  if (clean.experience) {
+    clean.experience.forEach((exp: any) => {
+      if (exp.description) exp.description = stripHtml(exp.description);
+      if (exp.items) {
+        exp.items.forEach((item: any) => {
+          if (item.text) item.text = stripHtml(item.text);
+        });
+      }
+    });
+  }
+
+  if (clean.customSections) {
+    clean.customSections.forEach((section: any) => {
+      if (section.items) {
+        section.items.forEach((item: any) => {
+          if (item.description) item.description = stripHtml(item.description);
+          if (item.title) item.title = stripHtml(item.title);
+        });
+      }
+    });
+  }
+
+  return clean;
+}
+
 export async function analyzeATSScore(
   cvData: CVData
 ): Promise<ATSAnalysisResult> {
@@ -254,6 +312,9 @@ export async function analyzeATSScore(
     ],
   };
 
+  // Prepare clean data for ATS
+  const cleaningData = cleanCVDataForATS(cvData);
+
   const prompt = `
     You are an expert ATS (Applicant Tracking System) analyzer.
     Evaluate the following CV data against the provided ATS Rule-Set.
@@ -262,7 +323,7 @@ export async function analyzeATSScore(
     ${ATS_RULE_SET}
 
     CV Data:
-    ${JSON.stringify(cvData, null, 2)}
+    ${JSON.stringify(cleaningData, null, 2)}
 
     Analyze the CV and provide:
     1. A score from 0 to 100.

@@ -1,8 +1,12 @@
+import { useRef } from "react";
 import type { CVData } from "../../types";
 import { trackEvent } from "../../lib/utils";
-import { ImportAction } from "./actions/ImportAction";
-import { ExportAction } from "./actions/ExportAction";
-import { ScannerAction } from "./actions/ScannerAction";
+import { ImportAction, type ImportActionHandle } from "./actions/ImportAction";
+import { ExportAction, type ExportActionHandle } from "./actions/ExportAction";
+import {
+  ScannerAction,
+  type ScannerActionHandle,
+} from "./actions/ScannerAction";
 import {
   Undo2,
   Redo2,
@@ -10,6 +14,10 @@ import {
   MoreHorizontal,
   MessageSquare,
   X,
+  FilePlus,
+  Sparkles as SparklesIcon,
+  Share2,
+  ShieldCheck,
 } from "lucide-react";
 import { formatRelative } from "date-fns";
 import {
@@ -47,6 +55,10 @@ export function EditorActions({
   const formatted = data.lastSaved
     ? formatRelative(new Date(data.lastSaved), new Date())
     : "";
+
+  const importRef = useRef<ImportActionHandle>(null);
+  const exportRef = useRef<ExportActionHandle>(null);
+  const scannerRef = useRef<ScannerActionHandle>(null);
 
   return (
     <div className="flex items-center gap-2 sm:gap-4">
@@ -136,17 +148,31 @@ export function EditorActions({
           </DropdownMenuLabel>
 
           <DropdownMenuItem
-            onSelect={(e) => e.preventDefault()}
-            className="bg-transparent!"
+            onSelect={() => importRef.current?.open()}
+            className="bg-transparent! p-0 focus:bg-transparent"
           >
-            <ImportAction setData={setData} />
+            <div className="w-full cursor-pointer group flex items-center gap-2 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 rounded-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors text-xs font-semibold border border-emerald-200 dark:border-emerald-800">
+              <div className="relative size-[16px] overflow-hidden">
+                <FilePlus
+                  size={14}
+                  className="transition-all group-hover:-translate-y-full"
+                />
+                <SparklesIcon
+                  size={14}
+                  className="transition-all group-hover:-translate-y-full"
+                />
+              </div>
+              Import
+            </div>
           </DropdownMenuItem>
 
           <DropdownMenuItem
-            onSelect={(e) => e.preventDefault()}
-            className="bg-transparent!"
+            onSelect={() => exportRef.current?.open()}
+            className="bg-transparent! p-0 focus:bg-transparent mt-1"
           >
-            <ExportAction data={data} />
+            <div className="w-full cursor-pointer flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs font-medium border border-gray-200 dark:border-gray-700">
+              <Share2 size={14} /> Export
+            </div>
           </DropdownMenuItem>
 
           <DropdownMenuSeparator className="my-1" />
@@ -156,10 +182,22 @@ export function EditorActions({
           </DropdownMenuLabel>
 
           <DropdownMenuItem
-            onSelect={(e) => e.preventDefault()}
-            className="bg-transparent!"
+            onSelect={() => scannerRef.current?.open()}
+            className="bg-transparent! p-0 focus:bg-transparent"
           >
-            <ScannerAction data={data} />
+            <div className="w-full cursor-pointer group flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-xs font-semibold border border-blue-200 dark:border-blue-800">
+              <div className="relative size-[16px] overflow-hidden">
+                <ShieldCheck
+                  size={14}
+                  className="transition-all group-hover:-translate-y-full"
+                />
+                <SparklesIcon
+                  size={14}
+                  className="transition-all group-hover:-translate-y-full"
+                />
+              </div>
+              Scanner ATS
+            </div>
           </DropdownMenuItem>
 
           {data.lastSaved && (
@@ -175,6 +213,10 @@ export function EditorActions({
           )}
         </DropdownMenuContent>
       </DropdownMenu>
+
+      <ImportAction setData={setData} ref={importRef} hideTrigger />
+      <ExportAction data={data} ref={exportRef} hideTrigger />
+      <ScannerAction data={data} ref={scannerRef} hideTrigger />
     </div>
   );
 }
