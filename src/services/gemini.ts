@@ -166,8 +166,15 @@ export async function parseResumeFromPdf(
   const prompt = `
     Extract resume data from the file provided.
     Ensure the output strictly adheres to the JSON schema provided.
+    
+    IMPORTANT for 'header.links':
+    - You MUST extract the actual URL/href for every link, not just the visible text.
+    - If a text is a hyperlink (e.g. "LinkedIn" or "Portfolio"), extract the underlying URL.
+    - For email addresses, include "mailto:" prefix in the url field if not present.
+    - For simple text links without hyperlinks, try to reconstruct the URL (e.g. for "github.com/user" -> "https://github.com/user").
+    - **CRITICAL FOR LINKEDIN**: If you see the text "LinkedIn" but no direct hyperlink, scan the entire document for a matching LinkedIn URL (e.g. "linkedin.com/in/...") and use that as the URL.
+    
     For 'experience.items', split the description into bullet points if possible.
-    For 'header.links', extract email, linkedin, etc.
     If a field is missing, use an empty string or empty array.
   `;
 
