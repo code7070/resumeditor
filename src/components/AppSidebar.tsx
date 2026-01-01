@@ -34,7 +34,7 @@ import {
 
 import { HeaderForm } from "./editor/HeaderForm";
 import { useState } from "react";
-import { DialogApp } from "./ui/DialogApp";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/Dialog";
 import { SummaryForm } from "./editor/SummaryForm";
 import { SectionEditor } from "./editor/SectionEditor";
 import type { CVData, CustomSection } from "../types";
@@ -273,64 +273,82 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
         </SidebarFooter>
       </Sidebar>
 
-      <DialogApp
-        isOpen={isHeaderDialogOpen}
-        onClose={() => setIsHeaderDialogOpen(false)}
-        title="Edit Header Details"
+      <Dialog
+        open={isHeaderDialogOpen}
+        onOpenChange={(open) => !open && setIsHeaderDialogOpen(false)}
       >
-        <div className="max-h-[80vh] overflow-y-auto px-1">
-          <HeaderForm
-            data={data.header}
-            onChange={(h) => setData((prev) => ({ ...prev, header: h }))}
-            confirmDelete={confirmDelete}
-          />
-        </div>
-      </DialogApp>
-
-      <DialogApp
-        isOpen={isSummaryDialogOpen}
-        onClose={() => setIsSummaryDialogOpen(false)}
-        title="Edit Professional Summary"
-      >
-        <div className="max-h-[80vh] overflow-y-auto px-1">
-          <SummaryForm
-            data={data.summary}
-            onChange={(s) => setData((prev) => ({ ...prev, summary: s }))}
-            fullData={data}
-          />
-        </div>
-      </DialogApp>
-
-      <DialogApp
-        isOpen={isExperienceDialogOpen}
-        onClose={() => setIsExperienceDialogOpen(false)}
-        title="Edit Experience"
-      >
-        <div className="max-h-[80vh] overflow-y-auto px-1">
-          <ExperienceForm
-            data={data.experience}
-            onChange={(exp) =>
-              setData((prev) => ({ ...prev, experience: exp }))
-            }
-            confirmDelete={confirmDelete}
-          />
-        </div>
-      </DialogApp>
-
-      {activeSection && (
-        <DialogApp
-          isOpen={!!activeSectionId}
-          onClose={() => setActiveSectionId(null)}
-          title={`Edit ${activeSection.name || "Section"}`}
-        >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Header Details</DialogTitle>
+          </DialogHeader>
           <div className="max-h-[80vh] overflow-y-auto px-1">
-            <SectionEditor
-              section={activeSection}
-              onChange={handleUpdateSection}
-              onDelete={() => handleDeleteSection(activeSection.id)}
+            <HeaderForm
+              data={data.header}
+              onChange={(h) => setData((prev) => ({ ...prev, header: h }))}
+              confirmDelete={confirmDelete}
             />
           </div>
-        </DialogApp>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isSummaryDialogOpen}
+        onOpenChange={(open) => !open && setIsSummaryDialogOpen(false)}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Professional Summary</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[80vh] overflow-y-auto px-1">
+            <SummaryForm
+              data={data.summary}
+              onChange={(s) => setData((prev) => ({ ...prev, summary: s }))}
+              fullData={data}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={isExperienceDialogOpen}
+        onOpenChange={(open) => !open && setIsExperienceDialogOpen(false)}
+      >
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Experience</DialogTitle>
+          </DialogHeader>
+          <div className="max-h-[80vh] overflow-y-auto px-1">
+            <ExperienceForm
+              data={data.experience}
+              onChange={(exp) =>
+                setData((prev) => ({ ...prev, experience: exp }))
+              }
+              confirmDelete={confirmDelete}
+            />
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {activeSection && (
+        <Dialog
+          open={!!activeSectionId}
+          onOpenChange={(open) => !open && setActiveSectionId(null)}
+        >
+          <DialogContent className="sm:max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>{`Edit ${
+                activeSection.name || "Section"
+              }`}</DialogTitle>
+            </DialogHeader>
+            <div className="max-h-[80vh] overflow-y-auto px-1">
+              <SectionEditor
+                section={activeSection}
+                onChange={handleUpdateSection}
+                onDelete={() => handleDeleteSection(activeSection.id)}
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       )}
     </>
   );

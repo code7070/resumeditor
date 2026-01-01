@@ -59,3 +59,17 @@ export const initGA = () => {
     document.body.appendChild(script2);
   }
 };
+
+export function ensureHtmlFormat(text: string | null | undefined): string {
+  if (!text) return "";
+  const trimmed = text.trim();
+  if (trimmed.length === 0) return "";
+  // Check if it already looks like HTML (starts with a tag)
+  if (trimmed.startsWith("<")) return text;
+
+  // Split by newlines and wrap in paragraphs
+  return trimmed
+    .split(/\n+/)
+    .map((line) => `<p>${line}</p>`)
+    .join("");
+}

@@ -88,7 +88,7 @@ export function EditorActions({
           save();
           trackEvent("editor_save");
         }}
-        className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all font-semibold text-xs shadow-sm hover:shadow active:scale-95"
+        className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-all font-semibold text-xs shadow-sm hover:shadow active:scale-95"
       >
         <Save size={14} className="sm:size-4" />
         <span>Save</span>
@@ -100,7 +100,7 @@ export function EditorActions({
           setIsAiChatOpen(!isAiChatOpen);
           trackEvent("editor_toggle_ai_chat", { isOpen: !isAiChatOpen });
         }}
-        className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-all font-semibold text-xs shadow-sm hover:shadow active:scale-95 ${
+        className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-md transition-all font-semibold text-xs shadow-sm hover:shadow active:scale-95 ${
           isAiChatOpen
             ? "bg-orange-700 text-white"
             : "bg-orange-600 text-white hover:bg-orange-700"

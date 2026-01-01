@@ -52,9 +52,11 @@ export function ExportAction({ data }: ExportActionProps) {
 
   const handleExportPDF = () => {
     trackEvent("export_pdf_print");
-    // Use native browser print which is more reliable for Tailwind v4 colors
-    window.print();
     setShowExportDialog(false);
+    // Use native browser print which is more reliable for Tailwind v4 colors
+    setTimeout(() => {
+      window.print();
+    }, 300);
   };
 
   return (

@@ -1,5 +1,5 @@
 import React, { useState, useRef } from "react";
-import { trackEvent } from "../../../lib/utils";
+import { trackEvent, ensureHtmlFormat } from "../../../lib/utils";
 import type { CVData } from "../../../types";
 import { SparkleIcon } from "../../icons/SparkleIcon";
 import { parseResumeFromPdf } from "../../../services/gemini";
@@ -11,6 +11,30 @@ import {
   DialogHeader,
   DialogTitle,
 } from "../../ui/Dialog";
+
+const formatImportedData = (data: Partial<CVData>): Partial<CVData> => {
+  const formatted = { ...data };
+
+  // Format Summary
+  if (formatted.summary) {
+    formatted.summary = ensureHtmlFormat(formatted.summary);
+  }
+
+  // Format Custom Sections
+  if (Array.isArray(formatted.customSections)) {
+    formatted.customSections = formatted.customSections.map((section) => ({
+      ...section,
+      items: Array.isArray(section.items)
+        ? section.items.map((item) => ({
+            ...item,
+            description: ensureHtmlFormat(item.description),
+          }))
+        : [],
+    }));
+  }
+
+  return formatted;
+};
 
 interface ImportActionProps {
   setData: React.Dispatch<React.SetStateAction<CVData>>;
@@ -47,7 +71,8 @@ export function ImportAction({ setData }: Readonly<ImportActionProps>) {
       if (file.type === "application/json") {
         const text = await file.text();
         const json = JSON.parse(text);
-        setData((prev) => ({ ...prev, ...json }));
+        const formatted = formatImportedData(json);
+        setData((prev) => ({ ...prev, ...formatted }));
         setIsImporting(false);
         setShowUploadDialog(false);
         trackEvent("import_success", { type: "json" });
@@ -62,7 +87,8 @@ export function ImportAction({ setData }: Readonly<ImportActionProps>) {
         try {
           const parsedData = await parseResumeFromPdf(base64Data, file.type);
           if (parsedData) {
-            setData((prev) => ({ ...prev, ...parsedData }));
+            const formatted = formatImportedData(parsedData);
+            setData((prev) => ({ ...prev, ...formatted }));
             setShowUploadDialog(false);
             trackEvent("import_success", { type: "pdf_ai" });
           }

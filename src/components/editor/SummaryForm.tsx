@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Loader2 } from "lucide-react";
 import { SparkleIcon } from "../icons/SparkleIcon";
 import { AiConsentDialog } from "../ui/AiConsentDialog";
-import { DialogApp } from "../ui/DialogApp";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "../ui/Dialog";
 import { refineText } from "../../services/gemini";
 import { RichTextEditor } from "./RichTextEditor";
 import type { CVData } from "../../types";
@@ -113,71 +113,77 @@ export function SummaryForm({
       </div>
 
       {/* Refine Selection Dialog */}
-      <DialogApp
-        isOpen={showRefineSelection}
-        onClose={() => setShowRefineSelection(false)}
-        title="Enhance Summary"
+      <Dialog
+        open={showRefineSelection}
+        onOpenChange={(open) => !open && setShowRefineSelection(false)}
       >
-        <div className="space-y-4">
-          <p className="text-sm text-gray-500">
-            Choose how you want to refine your professional summary.
-          </p>
-          <div className="flex gap-4">
-            <button
-              onClick={() => setRefineType("summary")}
-              className={`flex-1 p-4 rounded-lg border text-left hover:border-emerald-500 transition-all ${
-                refineType === "summary"
-                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
-                  : "border-gray-200 dark:border-gray-700"
-              }`}
-            >
-              <div className="font-semibold text-sm mb-1">
-                Refine Summary Only
-              </div>
-              <div className="text-xs text-gray-500">
-                Improves phrasing and impact of your current summary text.
-              </div>
-            </button>
-            <button
-              onClick={() => setRefineType("full")}
-              className={`flex-1 p-4 rounded-lg border text-left hover:border-emerald-500 transition-all ${
-                refineType === "full"
-                  ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
-                  : "border-gray-200 dark:border-gray-700"
-              }`}
-            >
-              <div className="font-semibold text-sm mb-1">Generate from CV</div>
-              <div className="text-xs text-gray-500">
-                Creates a new summary based on your experience and skills.
-              </div>
-            </button>
-          </div>
-
-          {refineType && (
-            <div className="space-y-2 pt-2 animate-in fade-in slide-in-from-top-2">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Additional Instructions (Optional)
-              </label>
-              <textarea
-                value={additionalPrompt}
-                onChange={(e) => setAdditionalPrompt(e.target.value)}
-                placeholder="E.g., Focus on leadership, emphasize React skills, make it concise..."
-                className="w-full p-3 bg-gray-50 dark:bg-gray-800 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none min-h-[80px]"
-              />
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Enhance Summary</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-sm text-gray-500">
+              Choose how you want to refine your professional summary.
+            </p>
+            <div className="flex gap-4">
+              <button
+                onClick={() => setRefineType("summary")}
+                className={`flex-1 p-4 rounded-lg border text-left hover:border-emerald-500 transition-all ${
+                  refineType === "summary"
+                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
+                    : "border-gray-200 dark:border-gray-700"
+                }`}
+              >
+                <div className="font-semibold text-sm mb-1">
+                  Refine Summary Only
+                </div>
+                <div className="text-xs text-gray-500">
+                  Improves phrasing and impact of your current summary text.
+                </div>
+              </button>
+              <button
+                onClick={() => setRefineType("full")}
+                className={`flex-1 p-4 rounded-lg border text-left hover:border-emerald-500 transition-all ${
+                  refineType === "full"
+                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
+                    : "border-gray-200 dark:border-gray-700"
+                }`}
+              >
+                <div className="font-semibold text-sm mb-1">
+                  Generate from CV
+                </div>
+                <div className="text-xs text-gray-500">
+                  Creates a new summary based on your experience and skills.
+                </div>
+              </button>
             </div>
-          )}
 
-          <div className="flex justify-end pt-2">
-            <button
-              onClick={executeRefine}
-              disabled={!refineType}
-              className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors"
-            >
-              Generate Ideas
-            </button>
+            {refineType && (
+              <div className="space-y-2 pt-2 animate-in fade-in slide-in-from-top-2">
+                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Additional Instructions (Optional)
+                </label>
+                <textarea
+                  value={additionalPrompt}
+                  onChange={(e) => setAdditionalPrompt(e.target.value)}
+                  placeholder="E.g., Focus on leadership, emphasize React skills, make it concise..."
+                  className="w-full p-3 bg-gray-50 dark:bg-gray-800 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none min-h-[80px]"
+                />
+              </div>
+            )}
+
+            <div className="flex justify-end pt-2">
+              <button
+                onClick={executeRefine}
+                disabled={!refineType}
+                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors"
+              >
+                Generate Ideas
+              </button>
+            </div>
           </div>
-        </div>
-      </DialogApp>
+        </DialogContent>
+      </Dialog>
 
       {/* Refine Consent Dialog */}
       <AiConsentDialog
@@ -199,49 +205,59 @@ export function SummaryForm({
       />
 
       {/* Refine Results Dialog */}
-      <DialogApp
-        isOpen={showRefineResults}
-        onClose={() => !isRefining && setShowRefineResults(false)}
-        title={isRefining ? "Refining Summary..." : "Choose a Version"}
+      <Dialog
+        open={showRefineResults}
+        onOpenChange={(open) =>
+          !open && !isRefining && setShowRefineResults(false)
+        }
       >
-        {isRefining ? (
-          <div className="py-12 flex flex-col items-center justify-center space-y-6">
-            <div className="relative">
-              <div className="w-16 h-16 border-4 border-emerald-50 border-t-emerald-600 rounded-full animate-spin"></div>
-              <div className="absolute inset-0 flex items-center justify-center">
-                <SparkleIcon className="w-6 h-6 text-emerald-600" />
-              </div>
-            </div>
-            <div className="text-center space-y-2">
-              <p className="text-sm font-bold text-gray-900">
-                Generating Improvements...
-              </p>
-              <p className="text-xs text-gray-500">
-                Creating professional variations for you.
-              </p>
-            </div>
-          </div>
-        ) : (
-          <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
-            {refineOptions.map((option, idx) => (
-              <button
-                key={idx}
-                onClick={() => applyRefineOption(option)}
-                className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50/30 transition-all group"
-              >
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-[10px] font-bold px-2 py-1 rounded bg-gray-100 text-gray-600 group-hover:bg-emerald-100 group-hover:text-emerald-700 transition-colors uppercase tracking-wider">
-                    Option {idx + 1}
-                  </span>
+        <DialogContent className="sm:max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>
+              {isRefining ? "Refining Summary..." : "Choose a Version"}
+            </DialogTitle>
+          </DialogHeader>
+          <div className="contents">
+            {isRefining ? (
+              <div className="py-12 flex flex-col items-center justify-center space-y-6">
+                <div className="relative">
+                  <div className="w-16 h-16 border-4 border-emerald-50 border-t-emerald-600 rounded-full animate-spin"></div>
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <SparkleIcon className="w-6 h-6 text-emerald-600" />
+                  </div>
                 </div>
-                <p className="text-xs text-gray-600 leading-relaxed dark:text-gray-300">
-                  {option}
-                </p>
-              </button>
-            ))}
+                <div className="text-center space-y-2">
+                  <p className="text-sm font-bold text-gray-900">
+                    Generating Improvements...
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Creating professional variations for you.
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-4 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                {refineOptions.map((option, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => applyRefineOption(option)}
+                    className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50/30 transition-all group"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-[10px] font-bold px-2 py-1 rounded bg-gray-100 text-gray-600 group-hover:bg-emerald-100 group-hover:text-emerald-700 transition-colors uppercase tracking-wider">
+                        Option {idx + 1}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-600 leading-relaxed dark:text-gray-300">
+                      {option}
+                    </p>
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
-        )}
-      </DialogApp>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
