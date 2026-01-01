@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { trackEvent } from "../../../lib/utils";
 import type { CVData } from "../../../types";
 import {
   analyzeATSScore,
@@ -73,12 +74,14 @@ export function ScannerAction({ data }: Readonly<ScannerActionProps>) {
   }, [atsResult]);
 
   const handleAnalyzeATS = async () => {
+    trackEvent("scanner_analyze_start");
     setIsAnalyzingATS(true);
     setShowATSDialog(true);
     setAtsResult(null);
     setViewingHistoryItem(null);
     try {
       const result = await analyzeATSScore(data);
+      trackEvent("scanner_analyze_success", { score: result.score });
       setAtsResult(result);
       const newItem: ATSHistoryItem = {
         id: crypto.randomUUID(),
@@ -97,6 +100,7 @@ export function ScannerAction({ data }: Readonly<ScannerActionProps>) {
 
   const openATSDialog = () => {
     // Show consent gate only if no result exists and no history
+    trackEvent("scanner_dialog_open");
     if (!atsResult && atsHistory.length === 0) {
       setShowConsentDialog(true);
     } else {

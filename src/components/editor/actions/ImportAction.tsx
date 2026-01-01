@@ -1,4 +1,5 @@
 import React, { useState, useRef } from "react";
+import { trackEvent } from "../../../lib/utils";
 import type { CVData } from "../../../types";
 import { SparkleIcon } from "../../icons/SparkleIcon";
 import { parseResumeFromPdf } from "../../../services/gemini";
@@ -49,6 +50,7 @@ export function ImportAction({ setData }: Readonly<ImportActionProps>) {
         setData((prev) => ({ ...prev, ...json }));
         setIsImporting(false);
         setShowUploadDialog(false);
+        trackEvent("import_success", { type: "json" });
         return;
       }
 
@@ -62,6 +64,7 @@ export function ImportAction({ setData }: Readonly<ImportActionProps>) {
           if (parsedData) {
             setData((prev) => ({ ...prev, ...parsedData }));
             setShowUploadDialog(false);
+            trackEvent("import_success", { type: "pdf_ai" });
           }
         } catch (err) {
           console.error(err);
@@ -82,7 +85,10 @@ export function ImportAction({ setData }: Readonly<ImportActionProps>) {
   return (
     <>
       <button
-        onClick={() => setShowUploadDialog(true)}
+        onClick={() => {
+          setShowUploadDialog(true);
+          trackEvent("import_dialog_open");
+        }}
         className="group flex items-center gap-2 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 rounded-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors text-xs font-semibold border border-emerald-200 dark:border-emerald-800 w-full"
       >
         <div className="relative size-[16px] overflow-hidden">

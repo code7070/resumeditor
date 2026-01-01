@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { trackEvent } from "../../../lib/utils";
 import type { CVData } from "../../../types";
 import { generateMarkdown, generateLatex } from "../../../utils/exporters";
 import {
@@ -28,6 +29,7 @@ export function ExportAction({ data }: ExportActionProps) {
   );
 
   const handleExport = (type: "md" | "tex" | "json") => {
+    trackEvent("export_click", { type });
     if (type === "json") {
       const content = JSON.stringify(data, null, 2);
       const blob = new Blob([content], { type: "application/json" });
@@ -49,6 +51,7 @@ export function ExportAction({ data }: ExportActionProps) {
   };
 
   const handleExportPDF = () => {
+    trackEvent("export_pdf_print");
     // Use native browser print which is more reliable for Tailwind v4 colors
     window.print();
     setShowExportDialog(false);
@@ -57,7 +60,10 @@ export function ExportAction({ data }: ExportActionProps) {
   return (
     <>
       <button
-        onClick={() => setShowExportDialog(true)}
+        onClick={() => {
+          setShowExportDialog(true);
+          trackEvent("export_dialog_open");
+        }}
         className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs font-medium border border-gray-200 dark:border-gray-700 w-full"
       >
         <Share2 size={14} /> Export

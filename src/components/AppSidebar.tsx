@@ -39,6 +39,7 @@ import { SummaryForm } from "./editor/SummaryForm";
 import { SectionEditor } from "./editor/SectionEditor";
 import type { CVData, CustomSection } from "../types";
 import { ExperienceForm } from "./editor/ExperienceForm";
+import { trackEvent } from "../lib/utils";
 
 interface AppSidebarProps {
   readonly data: CVData;
@@ -77,6 +78,7 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
       customSections: [...prev.customSections, newSection],
     }));
     setActiveSectionId(newSection.id);
+    trackEvent("section_add");
     closeSidebarOnInteract();
   };
 
@@ -177,6 +179,7 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
                     tooltip="Header Details"
                     onClick={() => {
                       setIsHeaderDialogOpen(true);
+                      trackEvent("section_edit_open", { section: "header" });
                       closeSidebarOnInteract();
                     }}
                   >
@@ -190,6 +193,7 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
                     tooltip="Professional Summary"
                     onClick={() => {
                       setIsSummaryDialogOpen(true);
+                      trackEvent("section_edit_open", { section: "summary" });
                       closeSidebarOnInteract();
                     }}
                   >
@@ -202,6 +206,9 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
                     tooltip="Experience"
                     onClick={() => {
                       setIsExperienceDialogOpen(true);
+                      trackEvent("section_edit_open", {
+                        section: "experience",
+                      });
                       closeSidebarOnInteract();
                     }}
                   >
@@ -223,6 +230,10 @@ export function AppSidebar({ data, setData, confirmDelete }: AppSidebarProps) {
                       tooltip={section.name || "Untitled Section"}
                       onClick={() => {
                         setActiveSectionId(section.id);
+                        trackEvent("section_edit_open", {
+                          section: "custom",
+                          name: section.name,
+                        });
                         closeSidebarOnInteract();
                       }}
                     >

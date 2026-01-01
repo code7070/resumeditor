@@ -1,4 +1,5 @@
 import type { CVData } from "../../types";
+import { trackEvent } from "../../lib/utils";
 import { ImportAction } from "./actions/ImportAction";
 import { ExportAction } from "./actions/ExportAction";
 import { ScannerAction } from "./actions/ScannerAction";
@@ -58,7 +59,10 @@ export function EditorActions({
       {/* Undo/Redo Group */}
       <div className="flex items-center gap-0.5 sm:gap-1 bg-muted/50 rounded-lg p-0.5 border border-transparent hover:border-border transition-all">
         <button
-          onClick={undo}
+          onClick={() => {
+            undo();
+            trackEvent("editor_undo");
+          }}
           disabled={!canUndo}
           className="p-1.5 sm:p-2 rounded-md hover:bg-background disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
           title="Undo (Ctrl+Z)"
@@ -66,7 +70,10 @@ export function EditorActions({
           <Undo2 size={16} className="text-muted-foreground" />
         </button>
         <button
-          onClick={redo}
+          onClick={() => {
+            redo();
+            trackEvent("editor_redo");
+          }}
           disabled={!canRedo}
           className="p-1.5 sm:p-2 rounded-md hover:bg-background disabled:opacity-30 disabled:cursor-not-allowed transition-all active:scale-95"
           title="Redo (Ctrl+Y)"
@@ -77,7 +84,10 @@ export function EditorActions({
 
       {/* Main Save Action */}
       <button
-        onClick={save}
+        onClick={() => {
+          save();
+          trackEvent("editor_save");
+        }}
         className="flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-all font-semibold text-xs shadow-sm hover:shadow active:scale-95"
       >
         <Save size={14} className="sm:size-4" />
@@ -86,7 +96,10 @@ export function EditorActions({
 
       {/* AI Assistant Button */}
       <button
-        onClick={() => setIsAiChatOpen(!isAiChatOpen)}
+        onClick={() => {
+          setIsAiChatOpen(!isAiChatOpen);
+          trackEvent("editor_toggle_ai_chat", { isOpen: !isAiChatOpen });
+        }}
         className={`flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-lg transition-all font-semibold text-xs shadow-sm hover:shadow active:scale-95 ${
           isAiChatOpen
             ? "bg-orange-700 text-white"
@@ -104,7 +117,11 @@ export function EditorActions({
       </button>
 
       {/* Secondary Actions Dropdown */}
-      <DropdownMenu>
+      <DropdownMenu
+        onOpenChange={(open) =>
+          trackEvent("editor_menu_toggle", { isOpen: open })
+        }
+      >
         <DropdownMenuTrigger asChild>
           <button className="p-1.5 sm:p-2 rounded-lg border bg-background hover:bg-muted text-muted-foreground transition-all active:scale-95 focus:outline-none ring-offset-background focus-visible:ring-2 focus-visible:ring-ring">
             <MoreHorizontal size={16} className="sm:size-5" />
