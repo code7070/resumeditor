@@ -366,10 +366,13 @@ export async function generateApplicationLetter(params: {
   companyName: string;
   position: string;
   jobDescription: string;
+  additionalNotes?: string;
+  useAiEnhance?: boolean;
 }): Promise<string> {
   if (!API_KEY) throw new Error("Missing VITE_GEMINI_API_KEY");
 
   const cleanData = cleanCVDataForATS(params.cvData);
+  const enhanceMode = params.useAiEnhance !== false;
 
   const prompt = `
     You are an expert cover letter writer. Generate a professional, compelling application letter.
@@ -381,13 +384,15 @@ export async function generateApplicationLetter(params: {
     - Company: ${params.companyName}
     - Position: ${params.position}
     - Job Description: ${params.jobDescription}
+    ${params.additionalNotes ? `\n    ADDITIONAL NOTES FROM CANDIDATE:\n    ${params.additionalNotes}` : ""}
 
     INSTRUCTIONS:
     - Write a formal application letter (3-4 paragraphs)
     - Opening: Express interest in the position and mention how you learned about it
     - Body: Highlight relevant experience, skills, and achievements from the CV that match the job description
+    ${params.additionalNotes ? "- Incorporate the candidate's additional notes naturally into the letter" : ""}
     - Closing: Express enthusiasm and request an interview
-    - Use professional but engaging tone
+    ${enhanceMode ? "- Use professional but engaging tone with polished, compelling language" : "- Use a straightforward, factual tone without embellishment"}
     - Do NOT include date, address headers, or "Dear" greeting — just the letter body paragraphs
     - Keep it concise (250-400 words)
     - Return plain text with paragraphs separated by double newlines

@@ -1,13 +1,18 @@
 import { useState, forwardRef, useImperativeHandle } from "react";
 import { trackEvent } from "../../../lib/utils";
 import type { CVData } from "../../../types";
-import { generateMarkdown, generateLatex } from "../../../utils/exporters";
+import {
+  generateMarkdown,
+  generateLatex,
+  generateDocx,
+} from "../../../utils/exporters";
 import {
   Share2,
   Printer,
   FileJson,
   FileText,
   FileCode,
+  FileType,
   Check,
   ChevronRight,
 } from "lucide-react";
@@ -33,7 +38,7 @@ export const ExportAction = forwardRef<ExportActionHandle, ExportActionProps>(
   ({ data, hideTrigger = false }, ref) => {
     const [showExportDialog, setShowExportDialog] = useState(false);
     const [copyStatus, setCopyStatus] = useState<
-      "idle" | "md" | "tex" | "json"
+      "idle" | "md" | "tex" | "json" | "docx"
     >("idle");
 
     useImperativeHandle(ref, () => ({
@@ -45,24 +50,22 @@ export const ExportAction = forwardRef<ExportActionHandle, ExportActionProps>(
 
     const handleExport = (type: "md" | "tex" | "json") => {
       trackEvent("export_click", { type });
+      let content: string;
       if (type === "json") {
-        const content = JSON.stringify(data, null, 2);
-        const blob = new Blob([content], { type: "application/json" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `resume-${(data.header.name || "cv")
-          .replace(/\s+/g, "-")
-          .toLowerCase()}.json`;
-        a.click();
-        URL.revokeObjectURL(url);
-        return;
+        content = JSON.stringify(data, null, 2);
+      } else if (type === "md") {
+        content = generateMarkdown(data);
+      } else {
+        content = generateLatex(data);
       }
-      const content =
-        type === "md" ? generateMarkdown(data) : generateLatex(data);
       navigator.clipboard.writeText(content);
       setCopyStatus(type);
       setTimeout(() => setCopyStatus("idle"), 2000);
+    };
+
+    const handleExportDocx = async () => {
+      trackEvent("export_click", { type: "docx" });
+      await generateDocx(data);
     };
 
     const handleExportPDF = () => {
@@ -80,32 +83,41 @@ export const ExportAction = forwardRef<ExportActionHandle, ExportActionProps>(
         iconColor: "text-accent-coral",
         iconBg: "bg-accent-coral-light",
         title: "Print / Save as PDF",
-        desc: "Use system dialog to save as PDF",
+        desc: "Use browser's print dialog to save as PDF",
         onClick: handleExportPDF,
+      },
+      {
+        key: "docx" as const,
+        icon: FileType,
+        iconColor: "text-blue-600",
+        iconBg: "bg-blue-50 dark:bg-blue-900/20",
+        title: "Download as Word",
+        desc: "Download as an editable Word document",
+        onClick: handleExportDocx,
       },
       {
         key: "json" as const,
         icon: FileJson,
         iconColor: "text-amber-600",
         iconBg: "bg-amber-50 dark:bg-amber-900/20",
-        title: "Download JSON",
-        desc: "Save a backup of your data",
+        title: "Copy as JSON",
+        desc: "Copy your resume data as structured JSON to clipboard",
         onClick: () => handleExport("json"),
       },
       {
         key: "md" as const,
         icon: FileText,
-        iconColor: "text-blue-600",
-        iconBg: "bg-blue-50 dark:bg-blue-900/20",
-        title: "Copy Metadata",
-        desc: "Copy as Markdown format",
+        iconColor: "text-emerald-600",
+        iconBg: "bg-emerald-50 dark:bg-emerald-900/20",
+        title: "Export as Markdown",
+        desc: "Download your resume as plain-text Markdown file",
         onClick: () => handleExport("md"),
       },
       {
         key: "tex" as const,
         icon: FileCode,
-        iconColor: "text-emerald-600",
-        iconBg: "bg-emerald-50 dark:bg-emerald-900/20",
+        iconColor: "text-purple-600",
+        iconBg: "bg-purple-50 dark:bg-purple-900/20",
         title: "Copy LaTeX",
         desc: "Copy as LaTeX format",
         onClick: () => handleExport("tex"),

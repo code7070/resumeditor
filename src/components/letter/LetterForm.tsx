@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ArrowLeft, Loader2, Upload } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, Pencil, Sparkles } from "lucide-react";
 import { Button } from "../ui/button";
 import { generateApplicationLetter } from "../../services/gemini";
 import type { CVData } from "../../types";
@@ -24,6 +24,8 @@ export function LetterForm({ cvData, onBack, onGenerated }: LetterFormProps) {
   const [companyName, setCompanyName] = useState("");
   const [position, setPosition] = useState("");
   const [jobDescription, setJobDescription] = useState("");
+  const [additionalNotes, setAdditionalNotes] = useState("");
+  const [useAiEnhance, setUseAiEnhance] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -54,6 +56,8 @@ export function LetterForm({ cvData, onBack, onGenerated }: LetterFormProps) {
         companyName: companyName.trim(),
         position: position.trim(),
         jobDescription: jobDescription.trim(),
+        additionalNotes: additionalNotes.trim() || undefined,
+        useAiEnhance,
       });
       onGenerated({
         companyName: companyName.trim(),
@@ -97,12 +101,19 @@ export function LetterForm({ cvData, onBack, onGenerated }: LetterFormProps) {
               : "border-border bg-card hover:border-accent-coral/50"
           }`}
         >
-          <div className="font-semibold text-sm text-foreground mb-1">
-            Manual Input
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-full bg-accent-coral-light flex items-center justify-center shrink-0">
+              <Pencil size={20} className="text-accent-coral" />
+            </div>
+            <div>
+              <div className="font-semibold text-sm text-foreground">
+                Manual Input
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Type or paste your details manually
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Enter company details and paste the job description
-          </p>
         </button>
         <button
           onClick={() => setMode("upload")}
@@ -112,12 +123,19 @@ export function LetterForm({ cvData, onBack, onGenerated }: LetterFormProps) {
               : "border-border bg-card hover:border-accent-coral/50"
           }`}
         >
-          <div className="font-semibold text-sm text-foreground mb-1">
-            Upload File
+          <div className="flex items-start gap-4">
+            <div className="w-12 h-12 rounded-full bg-accent-coral-light flex items-center justify-center shrink-0">
+              <Upload size={20} className="text-accent-coral" />
+            </div>
+            <div>
+              <div className="font-semibold text-sm text-foreground">
+                Upload File
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Upload a job description document
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-muted-foreground">
-            Upload a job description file (TXT, PDF)
-          </p>
         </button>
       </div>
 
@@ -222,6 +240,36 @@ export function LetterForm({ cvData, onBack, onGenerated }: LetterFormProps) {
           )}
         </div>
       </div>
+
+      {/* Additional Notes */}
+      <div className="space-y-1.5">
+        <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+          Additional Notes
+        </label>
+        <input
+          type="text"
+          value={additionalNotes}
+          onChange={(e) => setAdditionalNotes(e.target.value)}
+          className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
+          placeholder="e.g. Available from April, salary expectation $XXk..."
+        />
+      </div>
+
+      {/* AI Enhance Toggle */}
+      <label className="flex items-center gap-3 cursor-pointer">
+        <div className="relative">
+          <input
+            type="checkbox"
+            checked={useAiEnhance}
+            onChange={(e) => setUseAiEnhance(e.target.checked)}
+            className="sr-only peer"
+          />
+          <div className="w-9 h-5 bg-muted rounded-full peer-checked:bg-accent-coral transition-colors" />
+          <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
+        </div>
+        <span className="text-sm text-foreground">Use AI to enhance writing</span>
+        <Sparkles size={14} className="text-accent-coral" />
+      </label>
 
       {error && (
         <p className="text-sm text-destructive">{error}</p>

@@ -33,12 +33,29 @@ export interface CustomSection {
   items: CustomSectionItem[];
 }
 
+export type FontFamily = "outfit" | "inter" | "georgia" | "playfair" | "lato";
+
+export interface TypographySettings {
+  headingSize: number;
+  bodySize: number;
+  lineHeight: number;
+  letterSpacing: number;
+}
+
+export const defaultTypography: TypographySettings = {
+  headingSize: 14,
+  bodySize: 11,
+  lineHeight: 1.5,
+  letterSpacing: 0.5,
+};
+
 export interface CVData {
   header: Header;
   summary: string;
   experience: ExperienceItem[];
   customSections: CustomSection[];
-  font: "serif" | "sans" | "mono";
+  font: FontFamily;
+  typography?: TypographySettings;
   lastSaved?: string;
 }
 
@@ -77,7 +94,8 @@ export interface JobApplication {
 }
 
 export const initialCVData: CVData = {
-  font: "serif",
+  font: "outfit",
+  typography: defaultTypography,
   header: {
     name: "John Doe",
     role: "Software Engineer",

@@ -121,7 +121,7 @@ export function TrackerForm({
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-1.5">
             <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
-              Status
+              Progress
             </label>
             <select
               value={status}
@@ -150,14 +150,14 @@ export function TrackerForm({
 
         <div className="space-y-1.5">
           <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
-            Job URL (optional)
+            Application Link (optional)
           </label>
           <input
             type="url"
             value={jobUrl}
             onChange={(e) => setJobUrl(e.target.value)}
             className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
-            placeholder="https://..."
+            placeholder="https://example.com/job-posting"
           />
         </div>
 

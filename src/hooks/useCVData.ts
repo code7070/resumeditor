@@ -1,12 +1,19 @@
 import { useState, useEffect, useCallback } from "react";
 import type { CVData } from "../types";
-import { initialCVData } from "../types";
+import { initialCVData, defaultTypography } from "../types";
 
 export function useCVData() {
   const [data, setDataInternal] = useState<CVData>(() => {
     try {
       const saved = localStorage.getItem("cv-data");
-      return saved ? JSON.parse(saved) : initialCVData;
+      if (!saved) return initialCVData;
+      const parsed = JSON.parse(saved);
+      // Migrate legacy font values
+      if (parsed.font === "serif") parsed.font = "georgia";
+      if (parsed.font === "sans") parsed.font = "inter";
+      if (parsed.font === "mono") parsed.font = "lato";
+      if (!parsed.typography) parsed.typography = defaultTypography;
+      return parsed;
     } catch (e) {
       console.error("Failed to load CV data from local storage", e);
       return initialCVData;

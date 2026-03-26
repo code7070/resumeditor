@@ -19,36 +19,54 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
       return "justify-start";
     })();
 
-    // Use specific ATS-friendly fonts
-    const fontFamily = (() => {
-      if (data.font === "sans") return "var(--font-cv-sans)"; // Arial
-      if (data.font === "mono") return "var(--font-cv-mono)"; // Courier New
-      return "var(--font-cv-serif)"; // Times New Roman
-    })();
+    // Font family mapping
+    const fontFamilyMap: Record<string, string> = {
+      outfit: "var(--font-cv-outfit)",
+      inter: "var(--font-cv-inter)",
+      georgia: "var(--font-cv-georgia)",
+      playfair: "var(--font-cv-playfair)",
+      lato: "var(--font-cv-lato)",
+      // Legacy fallbacks
+      serif: "var(--font-cv-georgia)",
+      sans: "var(--font-cv-inter)",
+      mono: "var(--font-cv-lato)",
+    };
+    const fontFamily = fontFamilyMap[data.font] ?? "var(--font-cv-outfit)";
+
+    const typo = data.typography ?? { headingSize: 14, bodySize: 11, lineHeight: 1.5, letterSpacing: 0.5 };
+    const headingSize = `${typo.headingSize}pt`;
+    const bodySize = `${typo.bodySize}pt`;
+    const sectionHeaderSize = `${Math.max(typo.headingSize - 2, 10)}pt`;
+    const subTextSize = `${Math.max(typo.bodySize - 1, 8)}pt`;
 
     return (
       <div
         ref={ref}
         id="cv-preview"
         className="bg-white text-black p-[5mm_5mm] md:p-12 max-w-[210mm] mx-auto min-h-[297mm] shadow-lg print:shadow-none print:p-[12mm] print:max-w-none leading-tight [&_a]:underline"
-        style={{ fontFamily, fontSize: "11pt" }}
+        style={{
+          fontFamily,
+          fontSize: bodySize,
+          lineHeight: typo.lineHeight,
+          letterSpacing: `${typo.letterSpacing}px`,
+        }}
       >
         {/* Header */}
         <header
           className={`mb-2 pb-3 flex flex-col gap-1 ${headerContainerAlign}`}
         >
-          <h1 className="font-bold tracking-tight" style={{ fontSize: "16pt" }}>
+          <h1 className="font-bold tracking-tight" style={{ fontSize: headingSize }}>
             {data.header.name}
           </h1>
           {data.header.role && (
-            <div className="font-semibold" style={{ fontSize: "13pt" }}>
+            <div className="font-semibold" style={{ fontSize: sectionHeaderSize }}>
               {data.header.role}
             </div>
           )}
 
           <div
             className={`flex flex-wrap gap-x-2 text-black items-center ${subHeaderAlign}`}
-            style={{ fontSize: "10pt" }}
+            style={{ fontSize: subTextSize }}
           >
             {data.header.address && (
               <span className="font-medium">{data.header.address}</span>
@@ -57,7 +75,7 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
             {data.header.address && data.header.links.length > 0 && (
               <span
                 className="text-gray-400 select-none"
-                style={{ fontSize: "10pt" }}
+                style={{ fontSize: subTextSize }}
               >
                 |
               </span>
@@ -68,7 +86,7 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
                 {index > 0 && (
                   <span
                     className="text-gray-400 select-none"
-                    style={{ fontSize: "10pt" }}
+                    style={{ fontSize: subTextSize }}
                   >
                     |
                   </span>
@@ -91,13 +109,13 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
           <section className="mb-4">
             <h2
               className="font-bold mb-1.5 border-b border-black/50 pb-0.5"
-              style={{ fontSize: "12pt" }}
+              style={{ fontSize: sectionHeaderSize }}
             >
               SUMMARY
             </h2>
             <div
               className="text-black leading-snug text-justify"
-              style={{ fontSize: "11pt" }}
+              style={{ fontSize: bodySize }}
               dangerouslySetInnerHTML={{ __html: data.summary }}
             />
           </section>
@@ -108,7 +126,7 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
           <section className="mb-4">
             <h2
               className="font-bold mb-2 border-b border-black/50 pb-0.5"
-              style={{ fontSize: "12pt" }}
+              style={{ fontSize: sectionHeaderSize }}
             >
               EXPERIENCE
             </h2>
@@ -116,26 +134,26 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
               {data.experience.map((exp) => (
                 <div key={exp.id}>
                   <div className="flex justify-between items-baseline mb-0.5">
-                    <h3 className="font-bold" style={{ fontSize: "11pt" }}>
+                    <h3 className="font-bold" style={{ fontSize: bodySize }}>
                       {exp.title}
                     </h3>
                     <span
                       className="font-medium whitespace-nowrap"
-                      style={{ fontSize: "10pt" }}
+                      style={{ fontSize: subTextSize }}
                     >
                       {exp.year}
                     </span>
                   </div>
                   <div
                     className="mb-1 italic font-medium"
-                    style={{ fontSize: "10pt" }}
+                    style={{ fontSize: subTextSize }}
                   >
                     {exp.description}
                   </div>
                   {exp.items.length > 0 && (
                     <ul
                       className="list-disc list-outside ml-3 text-black space-y-0.5"
-                      style={{ fontSize: "11pt" }}
+                      style={{ fontSize: bodySize }}
                     >
                       {exp.items.map((item) => (
                         <li key={item.id} className="pl-0.5">
@@ -156,7 +174,7 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
             <section key={section.id}>
               <h2
                 className="font-bold mb-2 border-b border-black/50 pb-0.5"
-                style={{ fontSize: "12pt" }}
+                style={{ fontSize: sectionHeaderSize }}
               >
                 {section.name}
               </h2>
@@ -164,19 +182,19 @@ export const Preview = React.forwardRef<HTMLDivElement, PreviewProps>(
                 {section.items.map((item) => (
                   <div key={item.id}>
                     <div className="flex justify-between items-baseline mb-0.5">
-                      <h3 className="font-bold" style={{ fontSize: "11pt" }}>
+                      <h3 className="font-bold" style={{ fontSize: bodySize }}>
                         {item.title}
                       </h3>
                       <span
                         className="font-medium whitespace-nowrap"
-                        style={{ fontSize: "10pt" }}
+                        style={{ fontSize: subTextSize }}
                       >
                         {item.year}
                       </span>
                     </div>
                     <div
                       className="text-black leading-snug"
-                      style={{ fontSize: "11pt" }}
+                      style={{ fontSize: bodySize }}
                       dangerouslySetInnerHTML={{ __html: item.description }}
                     />
                   </div>

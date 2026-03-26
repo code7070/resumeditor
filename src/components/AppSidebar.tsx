@@ -17,16 +17,18 @@ import {
   FileText,
   Layers,
   Type,
-  User,
-  Sparkles,
+  Contact,
+  AlignLeft,
   ChevronRight,
   Plus,
   MailOpen,
   ShieldCheck,
-  GraduationCap,
-  Star,
   ClipboardList,
   ArrowLeft,
+  ArrowUpDown,
+  PenTool,
+  Award,
+  FolderOpen,
 } from "lucide-react";
 import { ThemeToggle } from "./ui/ThemeToggle";
 import {
@@ -47,8 +49,10 @@ import {
 import { Button } from "./ui/button";
 import { SummaryForm } from "./editor/SummaryForm";
 import { SectionEditor } from "./editor/SectionEditor";
-import type { CVData, CustomSection, Header, ExperienceItem } from "../types";
+import type { CVData, CustomSection, Header, ExperienceItem, FontFamily, TypographySettings } from "../types";
+import { defaultTypography } from "../types";
 import { ExperienceForm } from "./editor/ExperienceForm";
+import { FontStyleForm } from "./editor/FontStyleForm";
 import { trackEvent } from "../lib/utils";
 import type { AppView } from "../App";
 
@@ -87,7 +91,10 @@ export function AppSidebar({
     ExperienceItem[] | null
   >(null);
   const [draftSection, setDraftSection] = useState<CustomSection | null>(null);
-  const [draftFont, setDraftFont] = useState<CVData["font"] | null>(null);
+  const [draftFont, setDraftFont] = useState<{
+    font: FontFamily;
+    typography: TypographySettings;
+  } | null>(null);
 
   const { setOpenMobile, isMobile } = useSidebar();
 
@@ -118,11 +125,14 @@ export function AppSidebar({
   }, [data.experience]);
 
   const openFontDialog = useCallback(() => {
-    setDraftFont(data.font);
+    setDraftFont({
+      font: data.font,
+      typography: data.typography ?? defaultTypography,
+    });
     setIsFontDialogOpen(true);
     trackEvent("section_edit_open", { section: "font" });
     closeSidebarOnInteract();
-  }, [data.font]);
+  }, [data.font, data.typography]);
 
   const openSectionDialog = useCallback(
     (sectionId: string) => {
@@ -164,7 +174,11 @@ export function AppSidebar({
 
   const saveFont = () => {
     if (draftFont) {
-      setData((prev) => ({ ...prev, font: draftFont }));
+      setData((prev) => ({
+        ...prev,
+        font: draftFont.font,
+        typography: draftFont.typography,
+      }));
     }
     setIsFontDialogOpen(false);
   };
@@ -223,11 +237,6 @@ export function AppSidebar({
     );
   };
 
-  const fontLabels: Record<CVData["font"], { name: string; desc: string }> = {
-    serif: { name: "Serif", desc: "Classic, traditional look" },
-    sans: { name: "Sans", desc: "Modern, clean appearance" },
-    mono: { name: "Mono", desc: "Technical, code-like feel" },
-  };
 
   return (
     <>
@@ -239,11 +248,11 @@ export function AppSidebar({
               <SidebarMenuButton size="lg" asChild>
                 <div className="flex items-center gap-2 cursor-pointer">
                   <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-accent-coral text-white">
-                    <FileText className="size-4" />
+                    <PenTool className="size-4" />
                   </div>
                   <div className="flex flex-col gap-0.5 leading-none">
                     <span className="font-semibold text-sidebar-foreground">
-                      Resumaker
+                      ResumEditor
                     </span>
                     <span className="text-xs text-sidebar-foreground/50">
                       v0.1.0
@@ -290,13 +299,36 @@ export function AppSidebar({
                 <CollapsibleContent>
                   <SidebarGroupContent>
                     <SidebarMenu>
+                      {/* Font Style */}
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          tooltip="Font Style"
+                          onClick={openFontDialog}
+                        >
+                          <Type />
+                          <span>Font Style</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+
+                      {/* Sort Order — placeholder */}
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          tooltip="Sort Order (coming soon)"
+                          disabled
+                          className="opacity-40 cursor-not-allowed"
+                        >
+                          <ArrowUpDown />
+                          <span>Sort Order</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+
                       {/* Header Details */}
                       <SidebarMenuItem>
                         <SidebarMenuButton
                           tooltip="Header Details"
                           onClick={openHeaderDialog}
                         >
-                          <User />
+                          <Contact />
                           <span>Header Details</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -307,7 +339,7 @@ export function AppSidebar({
                           tooltip="Professional Summary"
                           onClick={openSummaryDialog}
                         >
-                          <Sparkles />
+                          <AlignLeft />
                           <span>Professional Summary</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -330,7 +362,7 @@ export function AppSidebar({
                           disabled
                           className="opacity-40 cursor-not-allowed"
                         >
-                          <GraduationCap />
+                          <FileText />
                           <span>Education</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
@@ -342,8 +374,32 @@ export function AppSidebar({
                           disabled
                           className="opacity-40 cursor-not-allowed"
                         >
-                          <Star />
+                          <FileText />
                           <span>Skills</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+
+                      {/* Projects — placeholder */}
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          tooltip="Projects (coming soon)"
+                          disabled
+                          className="opacity-40 cursor-not-allowed"
+                        >
+                          <FolderOpen />
+                          <span>Projects</span>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+
+                      {/* Certifications — placeholder */}
+                      <SidebarMenuItem>
+                        <SidebarMenuButton
+                          tooltip="Certifications (coming soon)"
+                          disabled
+                          className="opacity-40 cursor-not-allowed"
+                        >
+                          <Award />
+                          <span>Certifications</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
 
@@ -368,17 +424,6 @@ export function AppSidebar({
                         >
                           <Plus />
                           <span>Add Section</span>
-                        </SidebarMenuButton>
-                      </SidebarMenuItem>
-
-                      {/* Font Style — now opens modal */}
-                      <SidebarMenuItem>
-                        <SidebarMenuButton
-                          tooltip="Font Style"
-                          onClick={openFontDialog}
-                        >
-                          <Type />
-                          <span>Font Style</span>
                         </SidebarMenuButton>
                       </SidebarMenuItem>
                     </SidebarMenu>
@@ -564,61 +609,25 @@ export function AppSidebar({
           <DialogHeader>
             <DialogTitle>Font Style</DialogTitle>
           </DialogHeader>
-          <div className="px-6 py-5 space-y-3">
-            {(["serif", "sans", "mono"] as const).map((font) => (
-              <button
-                key={font}
-                onClick={() => setDraftFont(font)}
-                className={`w-full flex items-center gap-4 p-4 rounded-xl border text-left transition-all ${
-                  draftFont === font
-                    ? "border-accent-coral bg-accent-coral-light ring-1 ring-accent-coral/20"
-                    : "border-border hover:border-accent-coral/50 hover:bg-muted/50"
-                }`}
-              >
-                <div
-                  className={`text-2xl font-bold text-foreground w-12 text-center ${
-                    font === "serif"
-                      ? "font-serif"
-                      : font === "sans"
-                        ? "font-sans"
-                        : "font-mono"
-                  }`}
-                >
-                  Aa
-                </div>
-                <div className="flex-1">
-                  <div className="font-semibold text-sm text-foreground">
-                    {fontLabels[font].name}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {fontLabels[font].desc}
-                  </div>
-                </div>
-                {draftFont === font && (
-                  <div className="w-5 h-5 rounded-full bg-accent-coral flex items-center justify-center">
-                    <svg
-                      className="w-3 h-3 text-white"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={3}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                )}
-              </button>
-            ))}
+          <div className="max-h-[70vh] overflow-y-auto px-6 py-4">
+            {draftFont && (
+              <FontStyleForm
+                font={draftFont.font}
+                typography={draftFont.typography}
+                onFontChange={(f) =>
+                  setDraftFont((prev) => prev && { ...prev, font: f })
+                }
+                onTypographyChange={(t) =>
+                  setDraftFont((prev) => prev && { ...prev, typography: t })
+                }
+              />
+            )}
           </div>
           <DialogFooter>
             <Button variant="ghost" onClick={cancelFont}>
               Cancel
             </Button>
-            <Button onClick={saveFont}>Apply</Button>
+            <Button onClick={saveFont}>Save</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

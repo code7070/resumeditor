@@ -2,10 +2,12 @@
 @import "tw-animate-css";
 
 @theme {
-  /* ATS-friendly fonts for resume (CV preview) */
-  --font-cv-serif: "Times New Roman", Times, serif;
-  --font-cv-sans: Arial, Helvetica, sans-serif;
-  --font-cv-mono: "Courier New", Courier, monospace;
+  /* CV font families */
+  --font-cv-outfit: "Outfit", "Arial", sans-serif;
+  --font-cv-inter: "Inter", "Arial", sans-serif;
+  --font-cv-georgia: "Georgia", "Times New Roman", serif;
+  --font-cv-playfair: "Playfair Display", "Georgia", serif;
+  --font-cv-lato: "Lato", "Arial", sans-serif;
 
   /* Base */
   --color-white: #ffffff;
@@ -139,6 +141,7 @@
   --radius-md: 8px;
   --radius-lg: 12px;
   --radius-xl: 16px;
+  --radius-pill: 100px;
   --radius-2xl: 20px;
   --radius-3xl: 24px;
   --radius-4xl: 28px;

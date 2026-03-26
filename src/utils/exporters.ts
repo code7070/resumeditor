@@ -1,6 +1,178 @@
 import type { CVData } from "../types";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
+import {
+  Document,
+  Paragraph,
+  TextRun,
+  HeadingLevel,
+  Packer,
+  AlignmentType,
+  ExternalHyperlink,
+} from "docx";
+import { saveAs } from "file-saver";
+
+export async function generateDocx(data: CVData): Promise<void> {
+  const children: Paragraph[] = [];
+
+  // Header — Name
+  children.push(
+    new Paragraph({
+      children: [
+        new TextRun({ text: data.header.name, bold: true, size: 32 }),
+      ],
+      heading: HeadingLevel.HEADING_1,
+      alignment: AlignmentType.CENTER,
+    }),
+  );
+
+  // Header — Role
+  if (data.header.role) {
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: data.header.role, size: 24, color: "666666" }),
+        ],
+        alignment: AlignmentType.CENTER,
+      }),
+    );
+  }
+
+  // Header — Address
+  if (data.header.address) {
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: data.header.address, size: 20, color: "888888" }),
+        ],
+        alignment: AlignmentType.CENTER,
+      }),
+    );
+  }
+
+  // Header — Links
+  if (data.header.links.length > 0) {
+    children.push(
+      new Paragraph({
+        children: data.header.links.flatMap((link, i) => [
+          ...(i > 0
+            ? [new TextRun({ text: "  |  ", size: 20, color: "888888" })]
+            : []),
+          new ExternalHyperlink({
+            children: [
+              new TextRun({
+                text: link.label || link.url,
+                style: "Hyperlink",
+                size: 20,
+              }),
+            ],
+            link: link.url,
+          }),
+        ]),
+        alignment: AlignmentType.CENTER,
+      }),
+    );
+  }
+
+  // Blank line
+  children.push(new Paragraph({}));
+
+  // Summary
+  if (data.summary) {
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: "Summary", bold: true, size: 26 })],
+        heading: HeadingLevel.HEADING_2,
+      }),
+    );
+    // Strip HTML tags for plain text
+    const plainSummary = data.summary.replace(/<[^>]+>/g, "");
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: plainSummary, size: 22 })],
+      }),
+    );
+    children.push(new Paragraph({}));
+  }
+
+  // Experience
+  if (data.experience.length > 0) {
+    children.push(
+      new Paragraph({
+        children: [new TextRun({ text: "Experience", bold: true, size: 26 })],
+        heading: HeadingLevel.HEADING_2,
+      }),
+    );
+    for (const exp of data.experience) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: exp.title, bold: true, size: 22 }),
+            new TextRun({ text: `  ${exp.year}`, italics: true, size: 22, color: "888888" }),
+          ],
+        }),
+      );
+      if (exp.description) {
+        children.push(
+          new Paragraph({
+            children: [
+              new TextRun({ text: exp.description, italics: true, size: 22 }),
+            ],
+          }),
+        );
+      }
+      for (const item of exp.items) {
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: item.text, size: 22 })],
+            bullet: { level: 0 },
+          }),
+        );
+      }
+      children.push(new Paragraph({}));
+    }
+  }
+
+  // Custom Sections
+  for (const section of data.customSections) {
+    children.push(
+      new Paragraph({
+        children: [
+          new TextRun({ text: section.name, bold: true, size: 26 }),
+        ],
+        heading: HeadingLevel.HEADING_2,
+      }),
+    );
+    for (const item of section.items) {
+      children.push(
+        new Paragraph({
+          children: [
+            new TextRun({ text: item.title, bold: true, size: 22 }),
+            new TextRun({ text: `  ${item.year}`, italics: true, size: 22, color: "888888" }),
+          ],
+        }),
+      );
+      if (item.description) {
+        children.push(
+          new Paragraph({
+            children: [new TextRun({ text: item.description, size: 22 })],
+          }),
+        );
+      }
+    }
+    children.push(new Paragraph({}));
+  }
+
+  const doc = new Document({
+    sections: [{ children }],
+  });
+
+  const blob = await Packer.toBlob(doc);
+  saveAs(
+    blob,
+    `resume-${(data.header.name || "cv").replace(/\s+/g, "-").toLowerCase()}.docx`,
+  );
+}
 
 export function generateMarkdown(data: CVData): string {
   let md = `# ${data.header.name}\n\n`;

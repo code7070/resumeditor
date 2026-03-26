@@ -1,4 +1,4 @@
-import { Plus, Briefcase, FileText } from "lucide-react";
+import { Plus, Briefcase, FileText, ExternalLink } from "lucide-react";
 import { Button } from "../ui/button";
 import type { JobApplication, ApplicationStatus, ApplicationLetter } from "../../types";
 
@@ -77,12 +77,13 @@ export function TrackerList({
       {/* Table */}
       <div className="bg-card border border-border rounded-xl overflow-hidden">
         {/* Header */}
-        <div className="grid grid-cols-[1fr_1fr_130px_120px_1fr] bg-muted px-5 py-3 text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+        <div className="grid grid-cols-[1fr_80px_1fr_130px_120px_1fr] bg-muted px-5 py-3 text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
           <span>Company</span>
+          <span>Link</span>
           <span>Position</span>
-          <span>Status</span>
+          <span>Progress</span>
           <span>Applied</span>
-          <span>Letter</span>
+          <span>Application Letter</span>
         </div>
 
         {/* Rows */}
@@ -99,10 +100,26 @@ export function TrackerList({
             <button
               key={app.id}
               onClick={() => onEdit(app.id)}
-              className="w-full grid grid-cols-[1fr_1fr_130px_120px_1fr] px-5 py-3.5 border-t border-border text-left hover:bg-muted/50 transition-colors"
+              className="w-full grid grid-cols-[1fr_80px_1fr_130px_120px_1fr] px-5 py-3.5 border-t border-border text-left hover:bg-muted/50 transition-colors"
             >
               <span className="text-sm font-medium text-foreground truncate pr-4">
                 {app.companyName}
+              </span>
+              <span className="text-sm">
+                {app.jobUrl ? (
+                  <a
+                    href={app.jobUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-accent-coral hover:underline"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    <ExternalLink size={14} />
+                    View
+                  </a>
+                ) : (
+                  <span className="text-muted-foreground/40">—</span>
+                )}
               </span>
               <span className="text-sm text-foreground truncate pr-4">
                 {app.position}
@@ -117,9 +134,9 @@ export function TrackerList({
               <span className="text-sm text-muted-foreground">{date}</span>
               <span className="text-sm truncate">
                 {letterName ? (
-                  <span className="flex items-center gap-1.5 text-accent-coral">
+                  <span className="flex items-center gap-1.5 text-accent-coral hover:underline cursor-pointer">
                     <FileText size={14} />
-                    <span className="truncate">{letterName}</span>
+                    <span>View Letter</span>
                   </span>
                 ) : (
                   <span className="text-muted-foreground/40">—</span>
