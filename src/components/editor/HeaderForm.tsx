@@ -56,58 +56,62 @@ export function HeaderForm({ data, onChange, confirmDelete }: HeaderFormProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
+      {/* Name + Role side by side */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="space-y-1">
-          <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <div className="space-y-1.5">
+          <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
             Full Name
-          </div>
+          </label>
           <input
             type="text"
             value={data.name}
             onChange={(e) => updateField("name", e.target.value)}
-            className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
             placeholder="John Doe"
           />
         </div>
-        <div className="space-y-1">
-          <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+        <div className="space-y-1.5">
+          <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
             Role Title
-          </div>
+          </label>
           <input
             type="text"
             value={data.role}
             onChange={(e) => updateField("role", e.target.value)}
-            className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
             placeholder="Software Engineer"
           />
         </div>
-        <div className="space-y-1 md:col-span-2">
-          <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Address / Location
-          </div>
+      </div>
+
+      {/* Location + Alignment side by side */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-1.5">
+          <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+            Location
+          </label>
           <input
             type="text"
             value={data.address}
             onChange={(e) => updateField("address", e.target.value)}
-            className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-gray-400 dark:placeholder:text-gray-500"
+            className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
             placeholder="San Francisco, CA"
           />
         </div>
-
-        <div className="space-y-1 md:col-span-2">
-          <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase block tracking-wider">
+        <div className="space-y-1.5">
+          <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
             Alignment
-          </div>
-          <div className="flex bg-gray-50 dark:bg-gray-800 p-1 rounded-lg border border-gray-200 dark:border-gray-700 w-fit">
+          </label>
+          <div className="flex bg-muted p-1 rounded-lg border border-border w-fit">
             {(["left", "center", "right"] as const).map((align) => (
               <button
                 key={align}
                 onClick={() => updateField("align", align)}
                 className={`px-3 py-1.5 text-xs rounded-md capitalize transition-all ${
                   data.align === align
-                    ? "bg-white shadow-sm text-emerald-800 font-semibold ring-1 ring-black/5"
-                    : "text-gray-500 dark:text-gray-400 hover:text-gray-900 dark:hover:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-700"
+                    ? "bg-card shadow-sm text-accent-coral font-semibold ring-1 ring-border"
+                    : "text-muted-foreground hover:text-foreground hover:bg-card/50"
                 }`}
               >
                 {align}
@@ -117,9 +121,13 @@ export function HeaderForm({ data, onChange, confirmDelete }: HeaderFormProps) {
         </div>
       </div>
 
+      {/* Links section */}
       <div className="space-y-3 pt-2">
-        <div className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-          Links
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-4 bg-accent-coral rounded-full" />
+          <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+            Links
+          </label>
         </div>
         <DragDropContext onDragEnd={onDragEnd}>
           <Droppable droppableId="links">
@@ -135,11 +143,11 @@ export function HeaderForm({ data, onChange, confirmDelete }: HeaderFormProps) {
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className="flex gap-2 items-start group"
+                        className="flex gap-3 items-center group py-2"
                       >
                         <div
                           {...provided.dragHandleProps}
-                          className="cursor-move text-gray-300 hover:text-gray-500 p-1"
+                          className="cursor-move text-muted-foreground/40 hover:text-muted-foreground p-0.5"
                         >
                           <GripVertical size={14} />
                         </div>
@@ -150,7 +158,7 @@ export function HeaderForm({ data, onChange, confirmDelete }: HeaderFormProps) {
                             onChange={(e) =>
                               updateLink(link.id, "label", e.target.value)
                             }
-                            className="flex-1 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            className="flex-1 px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none text-sm placeholder:text-muted-foreground/50 transition-all"
                             placeholder="Label"
                           />
                           <input
@@ -159,15 +167,15 @@ export function HeaderForm({ data, onChange, confirmDelete }: HeaderFormProps) {
                             onChange={(e) =>
                               updateLink(link.id, "url", e.target.value)
                             }
-                            className="flex-2 p-2 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                            className="flex-2 px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none text-sm placeholder:text-muted-foreground/50 transition-all"
                             placeholder="URL"
                           />
                         </div>
                         <button
                           onClick={() => removeLink(link.id)}
-                          className="p-2 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                          className="p-1.5 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
                         >
-                          <Trash2 size={15} />
+                          <Trash2 size={16} />
                         </button>
                       </div>
                     )}
@@ -180,7 +188,7 @@ export function HeaderForm({ data, onChange, confirmDelete }: HeaderFormProps) {
         </DragDropContext>
         <button
           onClick={addLink}
-          className="flex items-center gap-1.5 text-xs text-emerald-700 hover:text-emerald-800 font-semibold px-2 py-1.5 rounded-md hover:bg-emerald-50 transition-colors"
+          className="flex items-center gap-1.5 text-xs text-accent-coral hover:text-accent-coral/80 font-semibold px-2 py-1.5 rounded-md hover:bg-accent-coral-light transition-colors"
         >
           <Plus size={14} /> Add Link
         </button>

@@ -66,9 +66,10 @@ export function SectionEditor({
 
   return (
     <div className="space-y-6">
-      <div className="space-y-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-lg border border-gray-200 dark:border-gray-700">
-        <div className="space-y-1">
-          <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+      {/* Section name + delete */}
+      <div className="space-y-4 p-4 bg-muted/50 rounded-lg border border-border">
+        <div className="space-y-1.5">
+          <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
             Section Name
           </label>
           <div className="flex gap-2">
@@ -76,12 +77,12 @@ export function SectionEditor({
               type="text"
               value={section.name}
               onChange={(e) => updateSectionName(e.target.value)}
-              className="flex-1 p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 outline-none font-bold text-emerald-900 transition-all"
+              className="flex-1 px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none font-bold transition-all"
               placeholder="E.g., Skills, Languages, Projects"
             />
             <button
               onClick={onDelete}
-              className="px-3 py-2 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors border border-transparent hover:border-red-100 dark:hover:border-red-900"
+              className="px-3 py-2 text-destructive hover:text-destructive/80 hover:bg-destructive/10 rounded-lg transition-colors border border-transparent hover:border-destructive/20"
               title="Delete Section"
             >
               <Trash2 size={18} />
@@ -90,14 +91,18 @@ export function SectionEditor({
         </div>
       </div>
 
+      {/* Items */}
       <div className="space-y-3">
         <div className="flex justify-between items-center px-1">
-          <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-            Items ({section.items.length})
-          </label>
+          <div className="flex items-center gap-2">
+            <div className="w-1 h-4 bg-accent-coral rounded-full" />
+            <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+              Items ({section.items.length})
+            </label>
+          </div>
           <button
             onClick={addItemToSection}
-            className="flex items-center gap-1.5 text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-100 dark:hover:bg-emerald-900/50 hover:text-emerald-800 dark:hover:text-emerald-200 font-semibold px-3 py-1.5 rounded-md transition-colors border border-emerald-100 dark:border-emerald-800"
+            className="flex items-center gap-1.5 text-xs text-accent-coral hover:text-accent-coral/80 font-semibold px-3 py-1.5 rounded-md hover:bg-accent-coral-light transition-colors border border-accent-coral/20"
           >
             <Plus size={14} /> Add Item
           </button>
@@ -117,17 +122,17 @@ export function SectionEditor({
                       <div
                         ref={provided.innerRef}
                         {...provided.draggableProps}
-                        className="p-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg space-y-3 relative group hover:shadow-sm transition-all"
+                        className="p-3 bg-card border border-border rounded-lg space-y-3 relative group hover:shadow-sm transition-all"
                       >
                         <div
                           {...provided.dragHandleProps}
-                          className="absolute top-3 left-2 text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 cursor-move z-10"
+                          className="absolute top-3 left-2 text-muted-foreground/30 hover:text-muted-foreground cursor-move z-10"
                         >
                           <GripVertical size={16} />
                         </div>
                         <button
                           onClick={() => removeItem(item.id)}
-                          className="absolute top-2 right-2 p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-2 right-2 p-1 text-muted-foreground/30 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
                           title="Remove Item"
                         >
                           <Trash2 size={14} />
@@ -139,7 +144,7 @@ export function SectionEditor({
                             onChange={(e) =>
                               updateItem(item.id, "title", e.target.value)
                             }
-                            className="col-span-2 p-2 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-transparent focus:bg-white dark:focus:bg-gray-950 border-gray-100 dark:border-gray-800 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-md outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 font-medium transition-all"
+                            className="col-span-2 px-3 py-2 bg-muted/50 text-foreground border border-transparent focus:bg-card focus:border-accent-coral rounded-md outline-none text-sm placeholder:text-muted-foreground/50 font-medium transition-all"
                             placeholder="Item Title"
                           />
                           <input
@@ -148,7 +153,7 @@ export function SectionEditor({
                             onChange={(e) =>
                               updateItem(item.id, "year", e.target.value)
                             }
-                            className="col-span-1 p-2 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-transparent focus:bg-white dark:focus:bg-gray-950 border-gray-100 dark:border-gray-800 focus:border-emerald-500 dark:focus:border-emerald-400 rounded-md outline-none text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500 text-right transition-all"
+                            className="col-span-1 px-3 py-2 bg-muted/50 text-foreground border border-transparent focus:bg-card focus:border-accent-coral rounded-md outline-none text-sm placeholder:text-muted-foreground/50 text-right transition-all"
                             placeholder="Year"
                           />
                         </div>

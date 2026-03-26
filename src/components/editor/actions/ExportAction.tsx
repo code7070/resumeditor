@@ -5,18 +5,20 @@ import { generateMarkdown, generateLatex } from "../../../utils/exporters";
 import {
   Share2,
   Printer,
-  Download,
   FileJson,
   FileText,
   FileCode,
   Check,
+  ChevronRight,
 } from "lucide-react";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../../ui/Dialog";
+import { Button } from "../../ui/button";
 
 export interface ExportActionHandle {
   open: () => void;
@@ -66,11 +68,49 @@ export const ExportAction = forwardRef<ExportActionHandle, ExportActionProps>(
     const handleExportPDF = () => {
       trackEvent("export_pdf_print");
       setShowExportDialog(false);
-      // Use native browser print which is more reliable for Tailwind v4 colors
       setTimeout(() => {
         window.print();
       }, 300);
     };
+
+    const exportOptions = [
+      {
+        key: "pdf" as const,
+        icon: Printer,
+        iconColor: "text-accent-coral",
+        iconBg: "bg-accent-coral-light",
+        title: "Print / Save as PDF",
+        desc: "Use system dialog to save as PDF",
+        onClick: handleExportPDF,
+      },
+      {
+        key: "json" as const,
+        icon: FileJson,
+        iconColor: "text-amber-600",
+        iconBg: "bg-amber-50 dark:bg-amber-900/20",
+        title: "Download JSON",
+        desc: "Save a backup of your data",
+        onClick: () => handleExport("json"),
+      },
+      {
+        key: "md" as const,
+        icon: FileText,
+        iconColor: "text-blue-600",
+        iconBg: "bg-blue-50 dark:bg-blue-900/20",
+        title: "Copy Metadata",
+        desc: "Copy as Markdown format",
+        onClick: () => handleExport("md"),
+      },
+      {
+        key: "tex" as const,
+        icon: FileCode,
+        iconColor: "text-emerald-600",
+        iconBg: "bg-emerald-50 dark:bg-emerald-900/20",
+        title: "Copy LaTeX",
+        desc: "Copy as LaTeX format",
+        onClick: () => handleExport("tex"),
+      },
+    ];
 
     return (
       <>
@@ -80,7 +120,7 @@ export const ExportAction = forwardRef<ExportActionHandle, ExportActionProps>(
               setShowExportDialog(true);
               trackEvent("export_dialog_open");
             }}
-            className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-md hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors text-xs font-medium border border-gray-200 dark:border-gray-700 w-full"
+            className="flex items-center gap-2 px-3 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 transition-colors text-xs font-medium border border-border w-full"
           >
             <Share2 size={14} /> Export
           </button>
@@ -88,111 +128,57 @@ export const ExportAction = forwardRef<ExportActionHandle, ExportActionProps>(
 
         {/* Export Dialog */}
         <Dialog open={showExportDialog} onOpenChange={setShowExportDialog}>
-          <DialogContent className="sm:max-w-md">
+          <DialogContent className="sm:max-w-[780px]">
             <DialogHeader>
               <DialogTitle>Export Resume</DialogTitle>
             </DialogHeader>
-            <div className="space-y-2">
-              <button
-                onClick={handleExportPDF}
-                className="w-full flex items-center justify-between p-4 bg-gradient-to-r from-emerald-50 to-emerald-100 hover:from-emerald-100 hover:to-emerald-200 rounded-lg transition-colors group text-left border border-emerald-200"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-md shadow-sm text-emerald-700 ring-1 ring-emerald-200">
-                    <Printer size={20} />
-                  </div>
-                  <div>
-                    <span className="block text-sm font-semibold text-gray-900">
-                      Print / Save as PDF
-                    </span>
-                    <span className="block text-xs text-gray-600">
-                      Use system dialog to save as PDF
-                    </span>
-                  </div>
-                </div>
-                <Download
-                  size={16}
-                  className="text-emerald-600 group-hover:text-emerald-700 transition-colors"
-                />
-              </button>
+            <div className="px-6 py-4 space-y-2">
+              {exportOptions.map((opt) => {
+                const Icon = opt.icon;
+                const isCopied =
+                  opt.key !== "pdf" && copyStatus === opt.key;
 
-              <button
-                onClick={() => handleExport("json")}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-md shadow-sm text-amber-700 ring-1 ring-gray-100">
-                    <FileJson size={20} />
-                  </div>
-                  <div>
-                    <span className="block text-sm font-semibold text-gray-900">
-                      Download JSON
-                    </span>
-                    <span className="block text-xs text-gray-500">
-                      Save a backup of your data
-                    </span>
-                  </div>
-                </div>
-                <Download
-                  size={16}
-                  className="text-gray-400 group-hover:text-amber-700 transition-colors"
-                />
-              </button>
-
-              <button
-                onClick={() => handleExport("md")}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-md shadow-sm text-blue-700 ring-1 ring-gray-100">
-                    <FileText size={20} />
-                  </div>
-                  <div>
-                    <span className="block text-sm font-semibold text-gray-900">
-                      Copy Metadata
-                    </span>
-                    <span className="block text-xs text-gray-500">
-                      Copy as Markdown format
-                    </span>
-                  </div>
-                </div>
-                {copyStatus === "md" ? (
-                  <Check size={16} className="text-emerald-600" />
-                ) : (
-                  <Download
-                    size={16}
-                    className="text-gray-400 group-hover:text-blue-700 transition-colors"
-                  />
-                )}
-              </button>
-
-              <button
-                onClick={() => handleExport("tex")}
-                className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-lg transition-colors group text-left border border-transparent hover:border-gray-200"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-white rounded-md shadow-sm text-emerald-700 ring-1 ring-gray-100">
-                    <FileCode size={20} />
-                  </div>
-                  <div>
-                    <span className="block text-sm font-semibold text-gray-900">
-                      Copy LaTeX
-                    </span>
-                    <span className="block text-xs text-gray-500">
-                      Copy as LaTeX format
-                    </span>
-                  </div>
-                </div>
-                {copyStatus === "tex" ? (
-                  <Check size={16} className="text-emerald-600" />
-                ) : (
-                  <Download
-                    size={16}
-                    className="text-gray-400 group-hover:text-emerald-700 transition-colors"
-                  />
-                )}
-              </button>
+                return (
+                  <button
+                    key={opt.key}
+                    onClick={opt.onClick}
+                    className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:border-accent-coral/50 hover:bg-muted/50 transition-all group text-left"
+                  >
+                    <div className="flex items-center gap-4">
+                      <div
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${opt.iconBg} ${opt.iconColor}`}
+                      >
+                        <Icon size={20} />
+                      </div>
+                      <div>
+                        <span className="block text-[15px] font-medium text-foreground">
+                          {opt.title}
+                        </span>
+                        <span className="block text-[13px] text-muted-foreground">
+                          {opt.desc}
+                        </span>
+                      </div>
+                    </div>
+                    {isCopied ? (
+                      <Check size={18} className="text-accent-coral" />
+                    ) : (
+                      <ChevronRight
+                        size={18}
+                        className="text-muted-foreground/40 group-hover:text-foreground transition-colors"
+                      />
+                    )}
+                  </button>
+                );
+              })}
             </div>
+            <DialogFooter>
+              <Button
+                variant="ghost"
+                onClick={() => setShowExportDialog(false)}
+              >
+                Close
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
       </>

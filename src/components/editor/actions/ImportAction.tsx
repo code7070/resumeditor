@@ -8,14 +8,16 @@ import { trackEvent, ensureHtmlFormat } from "../../../lib/utils";
 import type { CVData } from "../../../types";
 import { SparkleIcon } from "../../icons/SparkleIcon";
 import { parseResumeFromPdf } from "../../../services/gemini";
-import { Upload, SparklesIcon, Loader2, FilePlus } from "lucide-react";
+import { Upload, Loader2, FilePlus, SparklesIcon } from "lucide-react";
 import { AiConsentDialog } from "../../ui/AiConsentDialog";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../../ui/Dialog";
+import { Button } from "../../ui/button";
 
 const formatImportedData = (data: Partial<CVData>): Partial<CVData> => {
   const formatted = { ...data };
@@ -134,7 +136,7 @@ export const ImportAction = forwardRef<ImportActionHandle, ImportActionProps>(
               setShowUploadDialog(true);
               trackEvent("import_dialog_open");
             }}
-            className="group flex items-center gap-2 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 rounded-md hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors text-xs font-semibold border border-emerald-200 dark:border-emerald-800 w-full"
+            className="group flex items-center gap-2 px-3 py-2 bg-accent-coral-light text-accent-coral rounded-md hover:bg-accent-coral-light/80 transition-colors text-xs font-semibold border border-accent-coral/20 w-full"
           >
             <div className="relative size-[16px] overflow-hidden">
               <FilePlus
@@ -157,11 +159,11 @@ export const ImportAction = forwardRef<ImportActionHandle, ImportActionProps>(
             !isImporting && !open && setShowUploadDialog(false)
           }
         >
-          <DialogContent className="sm:max-w-2xl">
+          <DialogContent className="sm:max-w-[500px]">
             <DialogHeader>
               <DialogTitle>Import Resume</DialogTitle>
             </DialogHeader>
-            <div className="space-y-6">
+            <div className="px-6 py-4 space-y-4">
               <div // nosonar
                 role="button"
                 tabIndex={0}
@@ -170,36 +172,38 @@ export const ImportAction = forwardRef<ImportActionHandle, ImportActionProps>(
                     if (!isImporting) fileInputRef.current?.click();
                   }
                 }}
-                className={`border-2 border-dashed rounded-lg p-8 text-center transition-colors ${
+                className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
                   isImporting
-                    ? "border-emerald-200 bg-emerald-50"
-                    : "border-gray-200 hover:border-emerald-500 hover:bg-emerald-50/10 cursor-pointer"
+                    ? "border-accent-coral/30 bg-accent-coral-light/50"
+                    : "border-border hover:border-accent-coral hover:bg-muted/50 cursor-pointer"
                 }`}
                 onClick={() => !isImporting && fileInputRef.current?.click()}
               >
                 {isImporting ? (
                   <div className="flex flex-col items-center gap-3">
-                    <Loader2 className="w-8 h-8 text-emerald-600 animate-spin" />
+                    <Loader2 className="w-8 h-8 text-accent-coral animate-spin" />
                     <div className="space-y-1">
-                      <p className="text-sm font-medium text-emerald-900">
+                      <p className="text-[15px] font-medium text-foreground">
                         Analyzing your resume...
                       </p>
-                      <p className="text-xs text-emerald-700">
+                      <p className="text-[13px] text-muted-foreground">
                         This might take a few seconds
                       </p>
                     </div>
                   </div>
                 ) : (
-                  <div className="flex flex-col items-center gap-2">
-                    <div className="p-3 bg-white rounded-full shadow-sm mb-2 text-emerald-700 ring-1 ring-gray-100">
-                      <Upload className="w-6 h-6" />
+                  <div className="flex flex-col items-center gap-3">
+                    <div className="w-10 h-10 rounded-lg bg-accent-coral-light flex items-center justify-center text-accent-coral">
+                      <Upload className="w-5 h-5" />
                     </div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-gray-100">
-                      Click to upload a file
-                    </p>
-                    <p className="text-xs text-gray-500 dark:text-gray-400">
-                      Supports PDF, JSON, MD, TXT
-                    </p>
+                    <div className="space-y-1">
+                      <p className="text-[15px] font-medium text-foreground">
+                        Click to upload a file
+                      </p>
+                      <p className="text-[13px] text-muted-foreground">
+                        Supported: PDF, JSON, MD, TXT
+                      </p>
+                    </div>
                   </div>
                 )}
                 <input
@@ -211,11 +215,11 @@ export const ImportAction = forwardRef<ImportActionHandle, ImportActionProps>(
                   disabled={isImporting}
                 />
               </div>
-              <div className="bg-blue-50 p-4 rounded-md flex gap-3 border border-blue-100">
+              <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl flex gap-3 border border-blue-100 dark:border-blue-800">
                 <div className="text-blue-600 mt-0.5">
                   <SparkleIcon className="w-4 h-4" />
                 </div>
-                <div className="text-xs text-blue-800 leading-relaxed">
+                <div className="text-xs text-blue-800 dark:text-blue-300 leading-relaxed">
                   <span className="font-semibold block mb-1">
                     AI Extract Feature
                   </span>
@@ -225,6 +229,15 @@ export const ImportAction = forwardRef<ImportActionHandle, ImportActionProps>(
                 </div>
               </div>
             </div>
+            <DialogFooter>
+              <Button
+                variant="ghost"
+                onClick={() => setShowUploadDialog(false)}
+                disabled={isImporting}
+              >
+                Close
+              </Button>
+            </DialogFooter>
           </DialogContent>
         </Dialog>
 

@@ -131,245 +131,258 @@ export function ExperienceForm({
 
   return (
     <div className="space-y-4">
-      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-200 dark:border-gray-700 overflow-hidden">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30 flex justify-between items-center">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-gray-100 uppercase tracking-wider">
-            Experience
+      {/* Section header with accent line */}
+      <div className="flex justify-between items-center">
+        <div className="flex items-center gap-2">
+          <div className="w-1 h-4 bg-accent-coral rounded-full" />
+          <h3 className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+            Positions
           </h3>
-          <button
-            onClick={addExperience}
-            className="flex items-center gap-1.5 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 hover:text-emerald-800 font-semibold px-3 py-1.5 rounded-md transition-colors border border-emerald-100"
-          >
-            <Plus size={14} /> Add Position
-          </button>
         </div>
-        <div className="p-4 bg-white dark:bg-gray-800">
-          <DragDropContext onDragEnd={onDragEnd}>
-            <Droppable droppableId="experience" type="EXPERIENCE_LIST">
-              {(provided) => (
-                <div
-                  {...provided.droppableProps}
-                  ref={provided.innerRef}
-                  className="space-y-4"
-                >
-                  {data?.map((exp, index) => {
-                    const isExpanded = expandedId === exp.id;
-                    return (
-                      <Draggable
-                        key={exp.id}
-                        draggableId={exp.id}
-                        index={index}
+        <button
+          onClick={addExperience}
+          className="flex items-center gap-1.5 text-xs text-accent-coral hover:text-accent-coral/80 font-semibold px-3 py-1.5 rounded-md hover:bg-accent-coral-light transition-colors border border-accent-coral/20"
+        >
+          <Plus size={14} /> Add Position
+        </button>
+      </div>
+
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Droppable droppableId="experience" type="EXPERIENCE_LIST">
+          {(provided) => (
+            <div
+              {...provided.droppableProps}
+              ref={provided.innerRef}
+              className="space-y-3"
+            >
+              {data?.map((exp, index) => {
+                const isExpanded = expandedId === exp.id;
+                return (
+                  <Draggable
+                    key={exp.id}
+                    draggableId={exp.id}
+                    index={index}
+                  >
+                    {(provided) => (
+                      <div
+                        ref={provided.innerRef}
+                        {...provided.draggableProps}
+                        className="border border-border rounded-lg overflow-hidden bg-card transition-all"
                       >
-                        {(provided) => (
-                          <div
-                            ref={provided.innerRef}
-                            {...provided.draggableProps}
-                            className="border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden bg-white dark:bg-gray-800 ring-1 ring-black/0 focus-within:ring-emerald-500/20 focus-within:border-emerald-500 transition-all"
-                          >
+                        <div
+                          className={`flex justify-between items-center p-3 cursor-pointer transition-colors ${
+                            isExpanded
+                              ? "bg-muted border-b border-border"
+                              : "hover:bg-muted/50"
+                          }`}
+                          onClick={() =>
+                            setExpandedId(isExpanded ? null : exp.id)
+                          }
+                        >
+                          <div className="flex items-center gap-3">
                             <div
-                              className={`flex justify-between items-center p-3 cursor-pointer transition-colors ${
-                                isExpanded
-                                  ? "bg-gray-50 dark:bg-gray-700/50 border-b border-gray-200 dark:border-gray-700"
-                                  : "hover:bg-gray-50 dark:hover:bg-gray-700/50"
-                              }`}
-                              onClick={() =>
-                                setExpandedId(isExpanded ? null : exp.id)
-                              }
+                              {...provided.dragHandleProps}
+                              className="text-muted-foreground/40 hover:text-muted-foreground p-1"
                             >
-                              <div className="flex items-center gap-3">
-                                <div
-                                  {...provided.dragHandleProps}
-                                  className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 p-1"
-                                >
-                                  <GripVertical size={16} />
-                                </div>
-                                <div className="font-semibold text-gray-700 dark:text-gray-300 text-sm">
-                                  {exp.title || "Untitled Position"}
-                                </div>
-                              </div>
-                              <div className="flex items-center gap-2">
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation();
-                                    removeExperience(exp.id);
-                                  }}
-                                  className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
-                                >
-                                  <Trash2 size={14} />
-                                </button>
-                                {isExpanded ? (
-                                  <ChevronUp
-                                    size={16}
-                                    className="text-gray-400"
-                                  />
-                                ) : (
-                                  <ChevronDown
-                                    size={16}
-                                    className="text-gray-400"
-                                  />
-                                )}
-                              </div>
+                              <GripVertical size={16} />
                             </div>
-
-                            {isExpanded && (
-                              <div className="p-4 space-y-4 bg-white dark:bg-gray-800 cursor-default">
-                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                  <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                      Title / Company
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={exp.title}
-                                      onChange={(e) =>
-                                        updateExperience(
-                                          exp.id,
-                                          "title",
-                                          e.target.value
-                                        )
-                                      }
-                                      className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                                      placeholder="e.g. Senior Developer"
-                                    />
-                                  </div>
-                                  <div className="space-y-1">
-                                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                      Year / Duration
-                                    </label>
-                                    <input
-                                      type="text"
-                                      value={exp.year}
-                                      onChange={(e) =>
-                                        updateExperience(
-                                          exp.id,
-                                          "year",
-                                          e.target.value
-                                        )
-                                      }
-                                      className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none transition-all text-sm placeholder:text-gray-400 dark:placeholder:text-gray-500"
-                                      placeholder="e.g. 2020 - Present"
-                                    />
-                                  </div>
-                                </div>
-                                <div className="space-y-1">
-                                  <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                    Description
-                                  </label>
-                                  <textarea
-                                    value={exp.description}
-                                    onChange={(e) =>
-                                      updateExperience(
-                                        exp.id,
-                                        "description",
-                                        e.target.value
-                                      )
-                                    }
-                                    className="w-full p-2.5 bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 dark:focus:border-emerald-400 focus:ring-1 focus:ring-emerald-500 outline-none h-24 resize-none text-sm placeholder:text-gray-400 leading-relaxed"
-                                    placeholder="Brief description of your role..."
-                                  />
-                                </div>
-
-                                <div className="space-y-3 pt-2">
-                                  <div className="flex justify-between items-center">
-                                    <label className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                      Key Achievements
-                                    </label>
-                                    <button
-                                      onClick={() =>
-                                        addItemToExperience(exp.id)
-                                      }
-                                      className="text-xs text-emerald-700 dark:text-emerald-300 font-semibold hover:text-emerald-800 dark:hover:text-emerald-200 flex items-center gap-1"
-                                    >
-                                      <Plus size={12} /> Add Item
-                                    </button>
-                                  </div>
-                                  <Droppable
-                                    droppableId={`items-${exp.id}`}
-                                    type={`ITEMS_LIST_${exp.id}`}
-                                  >
-                                    {(provided) => (
-                                      <div
-                                        {...provided.droppableProps}
-                                        ref={provided.innerRef}
-                                        className="space-y-2"
-                                      >
-                                        {exp.items.map((item, idx) => (
-                                          <Draggable
-                                            key={item.id}
-                                            draggableId={item.id}
-                                            index={idx}
-                                          >
-                                            {(provided) => (
-                                              <div
-                                                ref={provided.innerRef}
-                                                {...provided.draggableProps}
-                                                className="flex gap-2 items-start bg-gray-50 dark:bg-gray-700/50 p-2 rounded-lg group border border-transparent hover:border-gray-200 dark:hover:border-gray-600 transition-colors"
-                                              >
-                                                <div
-                                                  {...provided.dragHandleProps}
-                                                  className="text-gray-300 dark:text-gray-600 hover:text-gray-500 dark:hover:text-gray-400 cursor-move mt-2"
-                                                >
-                                                  <GripVertical size={14} />
-                                                </div>
-                                                <div className="flex-1">
-                                                  <textarea
-                                                    value={item.text}
-                                                    onChange={(e) =>
-                                                      updateItemInExperience(
-                                                        exp.id,
-                                                        item.id,
-                                                        e.target.value
-                                                      )
-                                                    }
-                                                    className="w-full bg-transparent border-0 outline-none text-sm text-gray-900 dark:text-gray-100 placeholder:text-gray-400 dark:placeholder:text-gray-500 focus:ring-0 p-0 resize-none h-auto min-h-[1.5rem]"
-                                                    placeholder="Achievement or responsibility..."
-                                                    rows={Math.max(
-                                                      1,
-                                                      Math.ceil(
-                                                        item.text.length / 60
-                                                      )
-                                                    )}
-                                                  />
-                                                </div>
-                                                <button
-                                                  onClick={() =>
-                                                    removeItemFromExperience(
-                                                      exp.id,
-                                                      item.id
-                                                    )
-                                                  }
-                                                  className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 dark:hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
-                                                >
-                                                  <Trash2 size={14} />
-                                                </button>
-                                              </div>
-                                            )}
-                                          </Draggable>
-                                        ))}
-                                        {provided.placeholder}
-                                      </div>
-                                    )}
-                                  </Droppable>
-                                </div>
-                              </div>
+                            <div className="flex flex-col">
+                              <span className="font-semibold text-foreground text-sm">
+                                {exp.title || "Untitled Position"}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {exp.year}
+                              </span>
+                            </div>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                removeExperience(exp.id);
+                              }}
+                              className="p-1.5 text-muted-foreground/40 hover:text-destructive hover:bg-destructive/10 rounded-md transition-colors"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                            {isExpanded ? (
+                              <ChevronUp
+                                size={16}
+                                className="text-muted-foreground"
+                              />
+                            ) : (
+                              <ChevronDown
+                                size={16}
+                                className="text-muted-foreground"
+                              />
                             )}
                           </div>
+                        </div>
+
+                        {isExpanded && (
+                          <div className="p-4 space-y-4 cursor-default">
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div className="space-y-1.5">
+                                <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+                                  Title / Company
+                                </label>
+                                <input
+                                  type="text"
+                                  value={exp.title}
+                                  onChange={(e) =>
+                                    updateExperience(
+                                      exp.id,
+                                      "title",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all text-sm placeholder:text-muted-foreground/50"
+                                  placeholder="e.g. Senior Developer"
+                                />
+                              </div>
+                              <div className="space-y-1.5">
+                                <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+                                  Year / Duration
+                                </label>
+                                <input
+                                  type="text"
+                                  value={exp.year}
+                                  onChange={(e) =>
+                                    updateExperience(
+                                      exp.id,
+                                      "year",
+                                      e.target.value
+                                    )
+                                  }
+                                  className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all text-sm placeholder:text-muted-foreground/50"
+                                  placeholder="e.g. 2020 - Present"
+                                />
+                              </div>
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+                                Description
+                              </label>
+                              <textarea
+                                value={exp.description}
+                                onChange={(e) =>
+                                  updateExperience(
+                                    exp.id,
+                                    "description",
+                                    e.target.value
+                                  )
+                                }
+                                className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none h-24 resize-none text-sm placeholder:text-muted-foreground/50 leading-relaxed"
+                                placeholder="Brief description of your role..."
+                              />
+                            </div>
+
+                            {/* Achievements */}
+                            <div className="space-y-3 pt-2">
+                              <div className="flex justify-between items-center">
+                                <div className="flex items-center gap-2">
+                                  <div className="w-1 h-3.5 bg-accent-coral rounded-full" />
+                                  <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+                                    Achievements
+                                  </label>
+                                </div>
+                                <button
+                                  onClick={() =>
+                                    addItemToExperience(exp.id)
+                                  }
+                                  className="text-xs text-accent-coral font-semibold hover:text-accent-coral/80 flex items-center gap-1"
+                                >
+                                  <Plus size={12} /> Add Item
+                                </button>
+                              </div>
+                              <Droppable
+                                droppableId={`items-${exp.id}`}
+                                type={`ITEMS_LIST_${exp.id}`}
+                              >
+                                {(provided) => (
+                                  <div
+                                    {...provided.droppableProps}
+                                    ref={provided.innerRef}
+                                    className="space-y-2"
+                                  >
+                                    {exp.items.map((item, idx) => (
+                                      <Draggable
+                                        key={item.id}
+                                        draggableId={item.id}
+                                        index={idx}
+                                      >
+                                        {(provided) => (
+                                          <div
+                                            ref={provided.innerRef}
+                                            {...provided.draggableProps}
+                                            className="flex gap-2.5 items-start bg-muted/50 py-2 px-3 rounded-lg group border border-transparent hover:border-border transition-colors"
+                                          >
+                                            <div
+                                              {...provided.dragHandleProps}
+                                              className="text-muted-foreground/30 hover:text-muted-foreground cursor-move mt-2"
+                                            >
+                                              <GripVertical size={12} />
+                                            </div>
+                                            <div className="w-4 h-4 mt-1.5 rounded-full border-2 border-accent-coral/30 flex items-center justify-center shrink-0">
+                                              <div className="w-1.5 h-1.5 rounded-full bg-accent-coral/50" />
+                                            </div>
+                                            <div className="flex-1">
+                                              <textarea
+                                                value={item.text}
+                                                onChange={(e) =>
+                                                  updateItemInExperience(
+                                                    exp.id,
+                                                    item.id,
+                                                    e.target.value
+                                                  )
+                                                }
+                                                className="w-full bg-transparent border-0 outline-none text-sm text-foreground placeholder:text-muted-foreground/50 focus:ring-0 p-0 resize-none h-auto min-h-[1.5rem]"
+                                                placeholder="Achievement or responsibility..."
+                                                rows={Math.max(
+                                                  1,
+                                                  Math.ceil(
+                                                    item.text.length / 60
+                                                  )
+                                                )}
+                                              />
+                                            </div>
+                                            <button
+                                              onClick={() =>
+                                                removeItemFromExperience(
+                                                  exp.id,
+                                                  item.id
+                                                )
+                                              }
+                                              className="p-1 text-muted-foreground/30 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                              <Trash2 size={14} />
+                                            </button>
+                                          </div>
+                                        )}
+                                      </Draggable>
+                                    ))}
+                                    {provided.placeholder}
+                                  </div>
+                                )}
+                              </Droppable>
+                            </div>
+                          </div>
                         )}
-                      </Draggable>
-                    );
-                  })}
-                  {provided.placeholder}
-                  {(!data || data.length === 0) && (
-                    <div className="text-center py-8 text-gray-400 dark:text-gray-500 text-sm">
-                      No experience listed yet.
-                    </div>
-                  )}
+                      </div>
+                    )}
+                  </Draggable>
+                );
+              })}
+              {provided.placeholder}
+              {(!data || data.length === 0) && (
+                <div className="text-center py-8 text-muted-foreground text-sm">
+                  No experience listed yet.
                 </div>
               )}
-            </Droppable>
-          </DragDropContext>
-        </div>
-      </div>
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     </div>
   );
 }

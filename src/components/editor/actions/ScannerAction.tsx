@@ -10,16 +10,19 @@ import {
   SparklesIcon,
   ListRestart,
   ArrowRight,
+  Loader2,
 } from "lucide-react";
 import { AiConsentDialog } from "../../ui/AiConsentDialog";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
 } from "../../ui/Dialog";
 import { ConfirmDialog } from "../../ui/ConfirmDialog";
 import { ATSAnalysisArt } from "../../ATSAnalysisArt";
+import { Button } from "../../ui/button";
 
 interface ATSHistoryItem {
   id: string;
@@ -59,7 +62,6 @@ export const ScannerAction = forwardRef<
       }
     }
 
-    // Load saved ATS result
     const savedResult = localStorage.getItem("ats_current_result");
     if (savedResult) {
       try {
@@ -74,7 +76,6 @@ export const ScannerAction = forwardRef<
     localStorage.setItem("ats_history", JSON.stringify(atsHistory));
   }, [atsHistory]);
 
-  // Save current ATS result to localStorage
   useEffect(() => {
     if (atsResult) {
       localStorage.setItem("ats_current_result", JSON.stringify(atsResult));
@@ -107,7 +108,6 @@ export const ScannerAction = forwardRef<
   };
 
   const openATSDialog = () => {
-    // Show consent gate only if no result exists and no history
     trackEvent("scanner_dialog_open");
     if (!atsResult && atsHistory.length === 0) {
       setShowConsentDialog(true);
@@ -120,12 +120,18 @@ export const ScannerAction = forwardRef<
     open: openATSDialog,
   }));
 
+  const getScoreBadge = (score: number) => {
+    if (score >= 80) return { bg: "bg-positive-bg", text: "text-positive-green" };
+    if (score >= 60) return { bg: "bg-warning-bg", text: "text-warning-yellow" };
+    return { bg: "bg-error-bg", text: "text-error-red" };
+  };
+
   return (
     <>
       {!hideTrigger && (
         <button
           onClick={openATSDialog}
-          className="group flex items-center gap-2 px-3 py-2 bg-blue-50 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded-md hover:bg-blue-100 dark:hover:bg-blue-900/50 transition-colors text-xs font-semibold border border-blue-200 dark:border-blue-800 w-full"
+          className="group flex items-center gap-2 px-3 py-2 bg-muted text-foreground rounded-md hover:bg-muted/80 transition-colors text-xs font-semibold border border-border w-full"
         >
           <div className="relative size-[16px] overflow-hidden">
             <ShieldCheck
@@ -148,39 +154,35 @@ export const ScannerAction = forwardRef<
           !isAnalyzingATS && !open && setShowATSDialog(false)
         }
       >
-        <DialogContent className="sm:max-w-3xl max-h-[90vh] overflow-hidden flex flex-col">
-          <DialogHeader>
-            <DialogTitle>ATS Analysis Report</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-6 overflow-y-auto pr-2 custom-scrollbar -mx-2 px-2 flex-1">
-            {isAnalyzingATS ? (
-              <div className="py-20 flex flex-col items-center justify-center space-y-6">
-                <div className="relative">
-                  <div className="w-20 h-20 border-4 border-blue-50 border-t-blue-600 rounded-full animate-spin"></div>
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <ShieldCheck className="w-8 h-8 text-blue-600" />
-                  </div>
-                </div>
-                <div className="text-center space-y-2">
-                  <p className="text-base font-bold text-gray-900">
-                    Measuring Data Resonance...
-                  </p>
-                  <p className="text-xs text-gray-500 max-w-[200px] leading-relaxed">
-                    AI is currently evaluating your CV structure and keyword
-                    density.
-                  </p>
-                </div>
+        {isAnalyzingATS ? (
+          /* Loading State — w=400 centered */
+          <DialogContent className="sm:max-w-[400px]" showCloseButton={false}>
+            <div className="p-10 flex flex-col items-center justify-center gap-4">
+              <Loader2 className="w-8 h-8 text-accent-coral animate-spin" />
+              <div className="text-center space-y-2">
+                <p className="text-base font-semibold text-foreground">
+                  Measuring Data Resonance...
+                </p>
+                <p className="text-[13px] text-muted-foreground max-w-[260px]">
+                  AI is currently analyzing your CV. This may take a moment...
+                </p>
               </div>
-            ) : viewingHistoryItem ? (
-              <div className="flex flex-col h-full">
+            </div>
+          </DialogContent>
+        ) : (
+          /* Report / History — w=720 */
+          <DialogContent className="sm:max-w-[720px] max-h-[90vh] overflow-hidden flex flex-col">
+            <DialogHeader>
+              <DialogTitle>ATS Analysis Report</DialogTitle>
+            </DialogHeader>
+            <div className="flex-1 overflow-y-auto px-6 py-4 custom-scrollbar">
+              {viewingHistoryItem ? (
                 <ATSAnalysisArt
                   result={viewingHistoryItem.result}
                   timestamp={viewingHistoryItem.timestamp}
                   onBack={() => setViewingHistoryItem(null)}
                 />
-              </div>
-            ) : atsResult ? (
-              <div className="flex flex-col h-full pb-6">
+              ) : atsResult ? (
                 <ATSAnalysisArt
                   result={atsResult}
                   timestamp={Date.now()}
@@ -190,73 +192,78 @@ export const ScannerAction = forwardRef<
                       : undefined
                   }
                 />
-                <div className="px-6 mt-4">
-                  <button
-                    onClick={() => setShowRescanConfirm(true)}
-                    className="w-full py-3 bg-gray-100 text-gray-900 rounded-xl text-xs font-bold hover:bg-gray-200 transition-all flex items-center justify-center gap-2 border border-gray-200"
-                  >
-                    <ListRestart size={14} /> Re-Scan ATS Resonance
-                  </button>
-                </div>
-              </div>
-            ) : (
-              <div className="space-y-4 py-2">
-                <div className="flex items-center justify-between mb-2">
-                  <h3 className="text-xs font-black text-gray-400 uppercase tracking-widest">
-                    Recent Scans
-                  </h3>
-                  <button
-                    onClick={() => setShowConsentDialog(true)}
-                    className="text-[10px] font-bold text-blue-600 hover:underline"
-                  >
-                    New Scan
-                  </button>
-                </div>
-                {atsHistory.length === 0 ? (
-                  <div className="py-12 text-center text-gray-400">
-                    <p className="text-xs italic">No scan history found.</p>
+              ) : (
+                /* History List */
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-4 bg-accent-coral rounded-full" />
+                      <h3 className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
+                        Recent Scans
+                      </h3>
+                    </div>
+                    <button
+                      onClick={() => setShowConsentDialog(true)}
+                      className="text-xs font-semibold text-accent-coral hover:text-accent-coral/80"
+                    >
+                      New Scan
+                    </button>
                   </div>
-                ) : (
-                  <div className="grid gap-3">
-                    {atsHistory.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => setViewingHistoryItem(item)}
-                        className="w-full flex items-center justify-between p-4 bg-gray-50 hover:bg-gray-100 rounded-2xl transition-all border border-transparent hover:border-gray-200 group"
-                      >
-                        <div className="flex items-center gap-4">
-                          <div
-                            className={`w-10 h-10 rounded-full flex items-center justify-center font-black text-xs shadow-sm ${
-                              item.result.score >= 80
-                                ? "bg-emerald-50 text-emerald-700"
-                                : item.result.score >= 50
-                                ? "bg-blue-50 text-blue-700"
-                                : "bg-orange-50 text-orange-700"
-                            }`}
+                  {atsHistory.length === 0 ? (
+                    <div className="py-12 text-center text-muted-foreground">
+                      <p className="text-sm">No scan history found.</p>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      {atsHistory.map((item) => {
+                        const badge = getScoreBadge(item.result.score);
+                        return (
+                          <button
+                            key={item.id}
+                            onClick={() => setViewingHistoryItem(item)}
+                            className="w-full flex items-center justify-between p-4 rounded-xl border border-border hover:border-accent-coral/50 hover:bg-muted/50 transition-all group text-left"
                           >
-                            {Math.round(item.result.score)}
-                          </div>
-                          <div className="text-left">
-                            <p className="text-sm font-bold text-gray-900">
-                              ATS Assessment
-                            </p>
-                            <p className="text-[10px] text-gray-500">
-                              {new Date(item.timestamp).toLocaleString()}
-                            </p>
-                          </div>
-                        </div>
-                        <ArrowRight
-                          size={14}
-                          className="text-gray-400 group-hover:text-gray-900 transition-colors"
-                        />
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-        </DialogContent>
+                            <div className="flex items-center gap-4">
+                              <div
+                                className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${badge.bg} ${badge.text}`}
+                              >
+                                {Math.round(item.result.score)}
+                              </div>
+                              <div>
+                                <p className="text-sm font-semibold text-foreground">
+                                  ATS Assessment
+                                </p>
+                                <p className="text-xs text-muted-foreground">
+                                  {new Date(item.timestamp).toLocaleString()}
+                                </p>
+                              </div>
+                            </div>
+                            <ArrowRight
+                              size={14}
+                              className="text-muted-foreground/40 group-hover:text-foreground transition-colors"
+                            />
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <DialogFooter>
+              {(atsResult || viewingHistoryItem) && (
+                <Button
+                  variant="secondary"
+                  onClick={() => setShowRescanConfirm(true)}
+                >
+                  <ListRestart size={14} />
+                  Re-Scan
+                </Button>
+              )}
+              <Button onClick={() => setShowATSDialog(false)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        )}
       </Dialog>
 
       <AiConsentDialog
@@ -289,12 +296,11 @@ export const ScannerAction = forwardRef<
       <ConfirmDialog
         isOpen={showRescanConfirm}
         title="Re-Scan Optimization"
-        message="A new scan will perform a fresh analysis of your current CV data. This will not delete your past history, but it will replace the current active report view."
-        confirmLabel="Start New Scan"
+        message="A new scan will perform a fresh analysis of your current resume. This will not delete your past history, but it will replace the current active report view."
+        confirmLabel="Start Scan"
         isDestructive={false}
         onConfirm={() => {
           setShowRescanConfirm(false);
-          // Clear current result and history on re-scan
           setAtsResult(null);
           setAtsHistory([]);
           localStorage.removeItem("ats_current_result");

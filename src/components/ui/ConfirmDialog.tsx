@@ -1,5 +1,12 @@
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./Dialog";
 import { AlertTriangle } from "lucide-react";
+import { Button } from "./button";
 
 interface ConfirmDialogProps {
   readonly isOpen: boolean;
@@ -24,42 +31,35 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-[460px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6">
-          <div className="flex items-center gap-4 p-4 bg-amber-50 rounded-xl border border-amber-100">
-            <div className="shrink-0 p-2 bg-white rounded-full shadow-sm text-amber-600">
-              <AlertTriangle size={24} />
-            </div>
-            <p className="text-sm text-amber-900 leading-relaxed font-medium">
-              {message}
-            </p>
+        <div className="px-6 py-6 flex flex-col items-center text-center gap-5">
+          {/* Warning circle */}
+          <div className="w-14 h-14 rounded-full bg-warning-bg flex items-center justify-center">
+            <AlertTriangle size={28} className="text-warning-yellow" />
           </div>
 
-          <div className="flex gap-3">
-            <button
-              onClick={onClose}
-              className="flex-1 py-3 text-xs font-bold text-gray-500 hover:text-gray-900 transition-colors bg-gray-50 hover:bg-gray-100 rounded-xl"
-            >
-              {cancelLabel}
-            </button>
-            <button
-              onClick={() => {
-                onConfirm();
-                onClose();
-              }}
-              className={`flex-1 py-3 text-xs font-bold text-white rounded-xl transition-all shadow-lg shadow-black/5 ${
-                isDestructive
-                  ? "bg-red-600 hover:bg-red-700"
-                  : "bg-gray-900 hover:bg-black"
-              }`}
-            >
-              {confirmLabel}
-            </button>
-          </div>
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-[360px]">
+            {message}
+          </p>
         </div>
+        <DialogFooter>
+          <Button variant="secondary" onClick={onClose} className="flex-1">
+            {cancelLabel}
+          </Button>
+          <Button
+            variant={isDestructive ? "destructive" : "default"}
+            onClick={() => {
+              onConfirm();
+              onClose();
+            }}
+            className="flex-1"
+          >
+            {confirmLabel}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

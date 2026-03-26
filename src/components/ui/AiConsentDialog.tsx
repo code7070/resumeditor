@@ -1,6 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { Sparkles, ShieldCheck, type LucideIcon } from "lucide-react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./Dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "./Dialog";
+import { Button } from "./button";
 
 export interface AiConsentItem {
   id: string;
@@ -28,13 +35,11 @@ export function AiConsentDialog({
   consentItems,
   confirmLabel = "Proceed",
   icon = "sparkles",
-}: // isDestructive = false,
-Readonly<AiConsentDialogProps>) {
+}: Readonly<AiConsentDialogProps>) {
   const [acceptedItems, setAcceptedItems] = useState<Record<string, boolean>>(
     {}
   );
 
-  // Reset state when dialog opens
   useEffect(() => {
     if (isOpen) {
       setAcceptedItems({});
@@ -46,80 +51,59 @@ Readonly<AiConsentDialogProps>) {
     consentItems.every((item) => acceptedItems[item.id]);
 
   const Icon: LucideIcon = icon === "shield" ? ShieldCheck : Sparkles;
-  const iconColorClass =
-    icon === "shield" ? "text-blue-600" : "text-emerald-600";
-  const iconBgClass = icon === "shield" ? "bg-blue-50" : "bg-emerald-50";
-  const confirmBtnClass =
-    icon === "shield"
-      ? "bg-gray-900 hover:bg-black checkbox-blue"
-      : "bg-emerald-600 hover:bg-emerald-700 checkbox-emerald";
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-2xl">
+      <DialogContent className="sm:max-w-[480px]">
         <DialogHeader>
           <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
-        <div className="space-y-6 py-4">
-          {/* Header Section */}
-          <div
-            className={`${iconBgClass} p-6 rounded-2xl border border-transparent flex flex-col items-center text-center`}
-          >
-            <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-sm mb-4">
-              <Icon size={24} className={iconColorClass} />
+        <div className="px-6 py-4 space-y-5">
+          {/* Icon + Description */}
+          <div className="flex flex-col items-center text-center gap-4 py-2">
+            <div className="w-12 h-12 rounded-full bg-accent-coral-light flex items-center justify-center">
+              <Icon size={24} className="text-accent-coral" />
             </div>
-            <h3 className="text-base font-bold text-gray-900">{title}</h3>
-            <div className="text-xs text-gray-600 mt-2 leading-relaxed max-w-[90%]">
+            <div className="text-sm text-muted-foreground leading-relaxed max-w-[90%]">
               {description}
             </div>
           </div>
 
           {/* Consent Checkboxes */}
-          <div className="space-y-3">
+          <div className="space-y-2">
             {consentItems.map((item) => (
               <label
                 key={item.id}
-                className="flex items-start gap-3 p-4 bg-gray-50 rounded-xl cursor-pointer hover:bg-gray-100 transition-colors border border-transparent hover:border-gray-200 group"
+                className="flex items-start gap-3 py-2.5 px-0 cursor-pointer group"
               >
-                <input
-                  type="checkbox"
-                  className={`w-4 h-4 rounded border-gray-300 focus:ring-offset-0 focus:ring-0 cursor-pointer ${
-                    icon === "shield"
-                      ? "text-blue-600 focus:ring-blue-500 checked:bg-blue-600"
-                      : "text-emerald-600 focus:ring-emerald-500 checked:bg-emerald-600"
-                  }`}
-                  checked={!!acceptedItems[item.id]}
-                  onChange={(e) =>
-                    setAcceptedItems((prev) => ({
-                      ...prev,
-                      [item.id]: e.target.checked,
-                    }))
-                  }
-                />
-                <span className="text-xs text-gray-700 leading-tight group-hover:text-gray-900 transition-colors select-none">
+                <div className="relative mt-0.5">
+                  <input
+                    type="checkbox"
+                    className="w-5 h-5 rounded border-border text-accent-coral focus:ring-accent-coral focus:ring-offset-0 cursor-pointer"
+                    checked={!!acceptedItems[item.id]}
+                    onChange={(e) =>
+                      setAcceptedItems((prev) => ({
+                        ...prev,
+                        [item.id]: e.target.checked,
+                      }))
+                    }
+                  />
+                </div>
+                <span className="text-[13px] text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors select-none">
                   {item.label}
                 </span>
               </label>
             ))}
           </div>
-
-          {/* Footer Actions */}
-          <div className="flex gap-3 pt-2">
-            <button
-              onClick={onClose}
-              className="flex-1 py-3 text-xs font-bold text-gray-500 hover:text-gray-900 dark:hover:text-gray-200 hover:bg-gray-300 rounded-md transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              disabled={!allAccepted}
-              onClick={onConfirm}
-              className={`flex-1 py-3 text-white rounded-md text-xs font-bold transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg hover:shadow-xl hover:-translate-y-0.5 active:translate-y-0 ${confirmBtnClass}`}
-            >
-              {confirmLabel}
-            </button>
-          </div>
         </div>
+        <DialogFooter>
+          <Button variant="ghost" onClick={onClose}>
+            Cancel
+          </Button>
+          <Button disabled={!allAccepted} onClick={onConfirm}>
+            {confirmLabel}
+          </Button>
+        </DialogFooter>
       </DialogContent>
     </Dialog>
   );

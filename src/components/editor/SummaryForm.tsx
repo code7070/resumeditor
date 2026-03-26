@@ -72,24 +72,6 @@ export function SummaryForm({
 
   return (
     <div className="space-y-4">
-      {/* <div className="flex justify-between items-center bg-gray-50 dark:bg-gray-800/50 p-3 rounded-lg border border-gray-200 dark:border-gray-700">
-        <label className="text-sm font-semibold text-gray-700 dark:text-gray-300">
-          Content
-        </label>
-        <button
-          onClick={handleRefineSummary}
-          disabled={isRefining}
-          className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 text-[11px] hover:text-emerald-800 dark:hover:text-emerald-200 disabled:opacity-50 font-semibold bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800"
-        >
-          {isRefining ? (
-            <Loader2 className="w-3 h-3 animate-spin" />
-          ) : (
-            <SparkleIcon className="w-3 h-3" />
-          )}
-          Refine with AI
-        </button>
-      </div> */}
-
       <RichTextEditor
         value={data}
         onChange={onChange}
@@ -97,11 +79,14 @@ export function SummaryForm({
         className="h-64"
       />
 
-      <div className="flex justify-end">
+      <div className="flex justify-between items-center">
+        <p className="text-xs text-muted-foreground">
+          Write 2-4 sentences highlighting your key qualifications.
+        </p>
         <button
           onClick={handleRefineSummary}
           disabled={isRefining}
-          className="text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5 text-[11px] hover:text-emerald-800 dark:hover:text-emerald-200 disabled:opacity-50 font-semibold bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded hover:bg-emerald-100 dark:hover:bg-emerald-900/50 transition-colors border border-emerald-100 dark:border-emerald-800"
+          className="text-accent-coral flex items-center gap-1.5 text-[11px] hover:text-accent-coral/80 disabled:opacity-50 font-semibold bg-accent-coral-light px-2.5 py-1.5 rounded-md hover:bg-accent-coral-light/80 transition-colors border border-accent-coral/20"
         >
           {isRefining ? (
             <Loader2 className="w-3 h-3 animate-spin" />
@@ -117,42 +102,42 @@ export function SummaryForm({
         open={showRefineSelection}
         onOpenChange={(open) => !open && setShowRefineSelection(false)}
       >
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-[560px]">
           <DialogHeader>
             <DialogTitle>Enhance Summary</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
-            <p className="text-sm text-gray-500">
+          <div className="space-y-4 p-6 pt-0">
+            <p className="text-sm text-muted-foreground">
               Choose how you want to refine your professional summary.
             </p>
             <div className="flex gap-4">
               <button
                 onClick={() => setRefineType("summary")}
-                className={`flex-1 p-4 rounded-lg border text-left hover:border-emerald-500 transition-all ${
+                className={`flex-1 p-4 rounded-lg border text-left hover:border-accent-coral transition-all ${
                   refineType === "summary"
-                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
-                    : "border-gray-200 dark:border-gray-700"
+                    ? "border-accent-coral bg-accent-coral-light"
+                    : "border-border"
                 }`}
               >
-                <div className="font-semibold text-sm mb-1">
+                <div className="font-semibold text-sm mb-1 text-foreground">
                   Refine Summary Only
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   Improves phrasing and impact of your current summary text.
                 </div>
               </button>
               <button
                 onClick={() => setRefineType("full")}
-                className={`flex-1 p-4 rounded-lg border text-left hover:border-emerald-500 transition-all ${
+                className={`flex-1 p-4 rounded-lg border text-left hover:border-accent-coral transition-all ${
                   refineType === "full"
-                    ? "border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20"
-                    : "border-gray-200 dark:border-gray-700"
+                    ? "border-accent-coral bg-accent-coral-light"
+                    : "border-border"
                 }`}
               >
-                <div className="font-semibold text-sm mb-1">
+                <div className="font-semibold text-sm mb-1 text-foreground">
                   Generate from CV
                 </div>
-                <div className="text-xs text-gray-500">
+                <div className="text-xs text-muted-foreground">
                   Creates a new summary based on your experience and skills.
                 </div>
               </button>
@@ -160,14 +145,14 @@ export function SummaryForm({
 
             {refineType && (
               <div className="space-y-2 pt-2 animate-in fade-in slide-in-from-top-2">
-                <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
                   Additional Instructions (Optional)
                 </label>
                 <textarea
                   value={additionalPrompt}
                   onChange={(e) => setAdditionalPrompt(e.target.value)}
                   placeholder="E.g., Focus on leadership, emphasize React skills, make it concise..."
-                  className="w-full p-3 bg-gray-50 dark:bg-gray-800 text-sm border border-gray-200 dark:border-gray-700 rounded-lg focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none min-h-[80px]"
+                  className="w-full p-3 bg-card text-foreground text-sm border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none min-h-[80px] placeholder:text-muted-foreground/50"
                 />
               </div>
             )}
@@ -176,7 +161,7 @@ export function SummaryForm({
               <button
                 onClick={executeRefine}
                 disabled={!refineType}
-                className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm transition-colors"
+                className="px-4 py-2.5 bg-accent-coral text-white rounded-[10px] hover:bg-accent-coral/90 disabled:opacity-50 disabled:cursor-not-allowed font-semibold text-sm transition-colors"
               >
                 Generate Ideas
               </button>
@@ -211,26 +196,26 @@ export function SummaryForm({
           !open && !isRefining && setShowRefineResults(false)
         }
       >
-        <DialogContent className="sm:max-w-2xl">
+        <DialogContent className="sm:max-w-[560px]">
           <DialogHeader>
             <DialogTitle>
               {isRefining ? "Refining Summary..." : "Choose a Version"}
             </DialogTitle>
           </DialogHeader>
-          <div className="contents">
+          <div className="p-6 pt-0">
             {isRefining ? (
               <div className="py-12 flex flex-col items-center justify-center space-y-6">
                 <div className="relative">
-                  <div className="w-16 h-16 border-4 border-emerald-50 border-t-emerald-600 rounded-full animate-spin"></div>
+                  <div className="w-16 h-16 border-4 border-accent-coral-light border-t-accent-coral rounded-full animate-spin"></div>
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <SparkleIcon className="w-6 h-6 text-emerald-600" />
+                    <SparkleIcon className="w-6 h-6 text-accent-coral" />
                   </div>
                 </div>
                 <div className="text-center space-y-2">
-                  <p className="text-sm font-bold text-gray-900">
+                  <p className="text-sm font-bold text-foreground">
                     Generating Improvements...
                   </p>
-                  <p className="text-xs text-gray-500">
+                  <p className="text-xs text-muted-foreground">
                     Creating professional variations for you.
                   </p>
                 </div>
@@ -241,14 +226,14 @@ export function SummaryForm({
                   <button
                     key={idx}
                     onClick={() => applyRefineOption(option)}
-                    className="w-full text-left p-4 rounded-xl border border-gray-200 hover:border-emerald-500 hover:bg-emerald-50/30 transition-all group"
+                    className="w-full text-left p-4 rounded-xl border border-border hover:border-accent-coral hover:bg-accent-coral-light/30 transition-all group"
                   >
                     <div className="flex items-center gap-2 mb-2">
-                      <span className="text-[10px] font-bold px-2 py-1 rounded bg-gray-100 text-gray-600 group-hover:bg-emerald-100 group-hover:text-emerald-700 transition-colors uppercase tracking-wider">
+                      <span className="text-[10px] font-bold px-2 py-1 rounded bg-muted text-muted-foreground group-hover:bg-accent-coral-light group-hover:text-accent-coral transition-colors uppercase tracking-wider">
                         Option {idx + 1}
                       </span>
                     </div>
-                    <p className="text-xs text-gray-600 leading-relaxed dark:text-gray-300">
+                    <p className="text-xs text-muted-foreground leading-relaxed group-hover:text-foreground transition-colors">
                       {option}
                     </p>
                   </button>

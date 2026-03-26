@@ -361,6 +361,59 @@ export async function analyzeATSScore(
   }
 }
 
+export async function generateApplicationLetter(params: {
+  cvData: CVData;
+  companyName: string;
+  position: string;
+  jobDescription: string;
+}): Promise<string> {
+  if (!API_KEY) throw new Error("Missing VITE_GEMINI_API_KEY");
+
+  const cleanData = cleanCVDataForATS(params.cvData);
+
+  const prompt = `
+    You are an expert cover letter writer. Generate a professional, compelling application letter.
+
+    CANDIDATE DATA:
+    ${JSON.stringify(cleanData, null, 2)}
+
+    TARGET:
+    - Company: ${params.companyName}
+    - Position: ${params.position}
+    - Job Description: ${params.jobDescription}
+
+    INSTRUCTIONS:
+    - Write a formal application letter (3-4 paragraphs)
+    - Opening: Express interest in the position and mention how you learned about it
+    - Body: Highlight relevant experience, skills, and achievements from the CV that match the job description
+    - Closing: Express enthusiasm and request an interview
+    - Use professional but engaging tone
+    - Do NOT include date, address headers, or "Dear" greeting — just the letter body paragraphs
+    - Keep it concise (250-400 words)
+    - Return plain text with paragraphs separated by double newlines
+  `;
+
+  try {
+    const response = await client.models.generateContent({
+      model: "gemini-2.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: prompt }],
+        },
+      ],
+    });
+
+    const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+    if (!text) throw new Error("No response from Gemini");
+
+    return text.trim();
+  } catch (e) {
+    console.error("Gemini Letter Generation Error:", e);
+    throw e;
+  }
+}
+
 export async function chatWithGemini(
   messages: { role: "user" | "model"; content: string }[],
   data: Partial<CVData>,

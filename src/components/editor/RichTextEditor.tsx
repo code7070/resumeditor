@@ -281,10 +281,10 @@ const MarkButton = ({ format, icon: Icon }: { format: string; icon: any }) => {
         event.preventDefault();
         toggleMark(editor, format);
       }}
-      className={`p-1.5 rounded transition-colors ${
+      className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${
         isActive
-          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-          : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+          ? "bg-accent-coral-light text-accent-coral"
+          : "text-muted-foreground hover:bg-muted"
       }`}
     >
       <Icon size={16} />
@@ -305,10 +305,10 @@ const LinkButton = () => {
           insertLink(editor);
         }
       }}
-      className={`p-1.5 rounded transition-colors ${
+      className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${
         isActive
-          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-          : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+          ? "bg-accent-coral-light text-accent-coral"
+          : "text-muted-foreground hover:bg-muted"
       }`}
     >
       {isActive ? <Link2Off size={16} /> : <LinkIcon size={16} />}
@@ -325,10 +325,10 @@ const BlockButton = ({ format, icon: Icon }: { format: string; icon: any }) => {
         event.preventDefault();
         toggleBlock(editor, format);
       }}
-      className={`p-1.5 rounded transition-colors ${
+      className={`w-8 h-8 flex items-center justify-center rounded transition-colors ${
         isActive
-          ? "bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300"
-          : "text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-800"
+          ? "bg-accent-coral-light text-accent-coral"
+          : "text-muted-foreground hover:bg-muted"
       }`}
     >
       <Icon size={16} />
@@ -355,7 +355,7 @@ const Element = ({ attributes, children, element }: any) => {
       <a
         {...attributes}
         href={element.url}
-        className="text-emerald-600 underline cursor-pointer"
+        className="text-accent-coral underline cursor-pointer"
       >
         {children}
       </a>
@@ -434,7 +434,7 @@ export function RichTextEditor({
 
   return (
     <div
-      className={`border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex flex-col bg-white dark:bg-gray-900 ${className}`}
+      className={`border border-border rounded-lg overflow-hidden flex flex-col bg-card ${className}`}
     >
       <Slate
         editor={editor}
@@ -448,20 +448,20 @@ export function RichTextEditor({
           }
         }}
       >
-        <div className="flex items-center gap-1 p-1 border-b border-gray-200 dark:border-gray-700 bg-gray-50/50 dark:bg-gray-800/30">
+        <div className="flex items-center gap-0.5 p-1 border-b border-border bg-muted/50">
           <MarkButton format="bold" icon={Bold} />
           <MarkButton format="italic" icon={Italic} />
           <MarkButton format="underline" icon={Underline} />
-          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+          <div className="w-px h-4 bg-border mx-1" />
           <BlockButton format="bulleted-list" icon={List} />
-          <div className="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1" />
+          <div className="w-px h-4 bg-border mx-1" />
           <LinkButton />
         </div>
         <Editable
           renderElement={renderElement}
           renderLeaf={renderLeaf}
           placeholder={placeholder}
-          className="p-3 min-h-[150px] outline-none text-sm leading-relaxed text-gray-900 dark:text-gray-100"
+          className="px-3.5 py-2.5 min-h-[150px] outline-none text-sm leading-relaxed text-foreground"
         />
       </Slate>
     </div>

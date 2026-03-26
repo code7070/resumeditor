@@ -42,6 +42,40 @@ export interface CVData {
   lastSaved?: string;
 }
 
+export interface ApplicationLetter {
+  id: string;
+  companyName: string;
+  position: string;
+  jobDescription: string;
+  content: string;
+  recipientName?: string;
+  recipientAddress?: string;
+  createdAt: string;
+  updatedAt: string;
+  status: "draft" | "sent" | "archived";
+}
+
+export type ApplicationStatus =
+  | "applied"
+  | "screening"
+  | "interview"
+  | "offer"
+  | "rejected"
+  | "withdrawn";
+
+export interface JobApplication {
+  id: string;
+  companyName: string;
+  position: string;
+  status: ApplicationStatus;
+  appliedDate: string;
+  jobUrl?: string;
+  letterId?: string;
+  notes?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 export const initialCVData: CVData = {
   font: "serif",
   header: {
