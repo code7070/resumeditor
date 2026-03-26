@@ -1,5 +1,5 @@
 import { GoogleGenAI } from "@google/genai";
-import type { CVData } from "../types";
+import type { CVData, WritingTone, LanguageStyle, LetterLanguage, UploadedFile } from "../types";
 import ATS_RULE_SET from "./ats-rule-set.md?raw";
 import { parseAIResponse, type ParsedResponse } from "@/lib/parseAIResponse";
 
@@ -361,21 +361,71 @@ export async function analyzeATSScore(
   }
 }
 
-export async function generateApplicationLetter(params: {
+export interface GenerateLetterParams {
   cvData: CVData;
   companyName: string;
   position: string;
   jobDescription: string;
   additionalNotes?: string;
-  useAiEnhance?: boolean;
-}): Promise<string> {
+  writingTone: WritingTone;
+  languageStyle: LanguageStyle;
+  language: LetterLanguage;
+  uploadedFiles?: UploadedFile[];
+}
+
+async function extractJobDescriptionFromFile(file: UploadedFile): Promise<string> {
+  if (!API_KEY) throw new Error("Missing VITE_GEMINI_API_KEY");
+
+  // For plain text files, return content directly
+  if (file.mimeType === "text/plain" && file.textContent) {
+    return file.textContent;
+  }
+
+  const prompt = `Extract the job description text from this document. Return only the job description content as plain text, preserving the structure (requirements, responsibilities, qualifications, etc.). Do not add any commentary.`;
+
+  const response = await client.models.generateContent({
+    model: "gemini-2.5-flash",
+    contents: [
+      {
+        role: "user",
+        parts: [
+          { text: prompt },
+          { inlineData: { mimeType: file.mimeType, data: file.base64Data } },
+        ],
+      },
+    ],
+  });
+
+  const text = response.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (!text) throw new Error("Could not extract job description from file");
+  return text.trim();
+}
+
+export async function generateApplicationLetter(params: GenerateLetterParams): Promise<string> {
   if (!API_KEY) throw new Error("Missing VITE_GEMINI_API_KEY");
 
   const cleanData = cleanCVDataForATS(params.cvData);
-  const enhanceMode = params.useAiEnhance !== false;
+
+  const toneInstructions: Record<WritingTone, string> = {
+    formal: "Use a formal, respectful, and traditional tone — structured and dignified",
+    professional: "Use a confident, business-professional tone — polished and compelling",
+    casual: "Use a conversational, friendly tone — approachable yet still appropriate for a job application",
+  };
+
+  const styleInstructions: Record<LanguageStyle, string> = {
+    polished: "Write with eloquent, refined language — carefully crafted sentences with strong word choices",
+    straightforward: "Write in a direct, clear style — concise and factual without unnecessary embellishment",
+    creative: "Write with a unique, memorable style — stand out with vivid language and fresh perspectives",
+  };
+
+  const languageInstructions: Record<LetterLanguage, string> = {
+    english: "Write the entire letter in English",
+    indonesian: "Tulis seluruh surat dalam Bahasa Indonesia yang formal dan profesional",
+    auto: "Write in the same language as the job description — if the job description is in Indonesian, write in Indonesian; otherwise write in English",
+  };
 
   const prompt = `
-    You are an expert cover letter writer. Generate a professional, compelling application letter.
+    You are an expert cover letter writer. Generate a compelling application letter.
 
     CANDIDATE DATA:
     ${JSON.stringify(cleanData, null, 2)}
@@ -386,13 +436,17 @@ export async function generateApplicationLetter(params: {
     - Job Description: ${params.jobDescription}
     ${params.additionalNotes ? `\n    ADDITIONAL NOTES FROM CANDIDATE:\n    ${params.additionalNotes}` : ""}
 
-    INSTRUCTIONS:
-    - Write a formal application letter (3-4 paragraphs)
-    - Opening: Express interest in the position and mention how you learned about it
+    STYLE INSTRUCTIONS:
+    - Tone: ${toneInstructions[params.writingTone]}
+    - Writing style: ${styleInstructions[params.languageStyle]}
+    - Language: ${languageInstructions[params.language]}
+
+    STRUCTURE INSTRUCTIONS:
+    - Write 3-4 paragraphs
+    - Opening: Express interest in the position
     - Body: Highlight relevant experience, skills, and achievements from the CV that match the job description
-    ${params.additionalNotes ? "- Incorporate the candidate's additional notes naturally into the letter" : ""}
+    ${params.additionalNotes ? "- Incorporate the candidate's additional notes naturally" : ""}
     - Closing: Express enthusiasm and request an interview
-    ${enhanceMode ? "- Use professional but engaging tone with polished, compelling language" : "- Use a straightforward, factual tone without embellishment"}
     - Do NOT include date, address headers, or "Dear" greeting — just the letter body paragraphs
     - Keep it concise (250-400 words)
     - Return plain text with paragraphs separated by double newlines
@@ -417,6 +471,36 @@ export async function generateApplicationLetter(params: {
     console.error("Gemini Letter Generation Error:", e);
     throw e;
   }
+}
+
+export async function generateLetterWithProgress(
+  params: GenerateLetterParams,
+  onProgress: (step: number, description: string) => void
+): Promise<string> {
+  // Step 1: Clean CV data
+  onProgress(1, "Extracting your resume data");
+  const cleanData = cleanCVDataForATS(params.cvData);
+
+  // Brief pause so step 1 is visible
+  await new Promise((r) => setTimeout(r, 600));
+
+  // Step 2: Extract job description from file if needed
+  let jobDescription = params.jobDescription;
+  if (params.uploadedFiles?.length) {
+    onProgress(2, "Extracting job description content");
+    jobDescription = await extractJobDescriptionFromFile(params.uploadedFiles[0]);
+  } else {
+    onProgress(2, "Analyzing job requirements");
+    await new Promise((r) => setTimeout(r, 600));
+  }
+
+  // Step 3: Generate letter
+  onProgress(3, "Crafting your application letter");
+  return generateApplicationLetter({
+    ...params,
+    cvData: cleanData,
+    jobDescription,
+  });
 }
 
 export async function chatWithGemini(

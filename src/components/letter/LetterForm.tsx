@@ -1,75 +1,194 @@
-import { useState } from "react";
-import { ArrowLeft, Loader2, Upload, Pencil, Sparkles } from "lucide-react";
+import { useState, useRef } from "react";
+import {
+  ArrowLeft,
+  Pencil,
+  CloudUpload,
+  Sparkles,
+  ChevronDown,
+  ChevronUp,
+  X,
+  Mic,
+  PenTool,
+  Globe,
+} from "lucide-react";
 import { Button } from "../ui/button";
-import { generateApplicationLetter } from "../../services/gemini";
-import type { CVData } from "../../types";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "../ui/collapsible";
+import type { CVData, WritingTone, LanguageStyle, LetterLanguage, UploadedFile } from "../../types";
+
+export interface LetterFormData {
+  companyName: string;
+  position: string;
+  jobDescription: string;
+  additionalNotes?: string;
+  writingTone: WritingTone;
+  languageStyle: LanguageStyle;
+  language: LetterLanguage;
+  uploadedFiles?: UploadedFile[];
+}
 
 interface LetterFormProps {
   cvData: CVData;
   onBack: () => void;
-  onGenerated: (letter: {
-    companyName: string;
-    position: string;
-    jobDescription: string;
-    content: string;
-  }) => void;
+  onSubmit: (data: LetterFormData) => void;
+  initialData?: Partial<LetterFormData>;
 }
 
 type InputMode = "manual" | "upload";
-type JDInputMode = "paste" | "upload";
 
-export function LetterForm({ cvData, onBack, onGenerated }: LetterFormProps) {
-  const [mode, setMode] = useState<InputMode>("manual");
-  const [jdMode, setJdMode] = useState<JDInputMode>("paste");
-  const [companyName, setCompanyName] = useState("");
-  const [position, setPosition] = useState("");
-  const [jobDescription, setJobDescription] = useState("");
-  const [additionalNotes, setAdditionalNotes] = useState("");
-  const [useAiEnhance, setUseAiEnhance] = useState(true);
-  const [isGenerating, setIsGenerating] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+async function fileToUploadedFile(file: File): Promise<UploadedFile> {
+  const base64Data = await new Promise<string>((resolve, reject) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = () => {
+      const result = reader.result as string;
+      resolve(result.split(",")[1]);
+    };
+    reader.onerror = reject;
+  });
 
-  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    try {
-      const text = await file.text();
-      setJobDescription(text);
-      setJdMode("paste"); // Switch to paste to show content
-    } catch {
-      setError("Failed to read file");
-    }
-    e.target.value = "";
+  const uploadedFile: UploadedFile = {
+    name: file.name,
+    mimeType: file.type || "application/octet-stream",
+    base64Data,
   };
 
-  const handleGenerate = async () => {
-    if (!companyName.trim() || !position.trim() || !jobDescription.trim()) {
-      setError("Please fill in all fields");
+  if (file.type === "text/plain") {
+    uploadedFile.textContent = await file.text();
+  }
+
+  return uploadedFile;
+}
+
+const TONE_OPTIONS: { value: WritingTone; label: string; subtitle: string }[] = [
+  { value: "formal", label: "Formal", subtitle: "Traditional & structured" },
+  { value: "professional", label: "Professional", subtitle: "Business-appropriate" },
+  { value: "casual", label: "Casual", subtitle: "Warm & conversational" },
+];
+
+const STYLE_OPTIONS: { value: LanguageStyle; label: string; subtitle: string }[] = [
+  { value: "straightforward", label: "Straightforward", subtitle: "Clear and direct" },
+  { value: "polished", label: "Polished & Compelling", subtitle: "Highlights achievements persuasively" },
+  { value: "creative", label: "Creative & Bold", subtitle: "Distinctive and memorable" },
+];
+
+const LANGUAGE_OPTIONS: { value: LetterLanguage; label: string; subtitle: string }[] = [
+  { value: "auto", label: "Auto-detect", subtitle: "Match job description language" },
+  { value: "english", label: "English", subtitle: "Write in English" },
+  { value: "indonesian", label: "Indonesian", subtitle: "Write in Bahasa Indonesia" },
+];
+
+// Labels used in collapsed summary (shorter)
+const TONE_SUMMARY: Record<WritingTone, string> = {
+  formal: "Formal",
+  professional: "Professional",
+  casual: "Casual",
+};
+const STYLE_SUMMARY: Record<LanguageStyle, string> = {
+  straightforward: "Straightforward",
+  polished: "Polished",
+  creative: "Creative",
+};
+const LANGUAGE_SUMMARY: Record<LetterLanguage, string> = {
+  auto: "Auto-detect",
+  english: "English",
+  indonesian: "Indonesian",
+};
+
+function RadioCards<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: T; label: string; subtitle: string }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="flex gap-3">
+      {options.map((opt) => (
+        <button
+          key={opt.value}
+          type="button"
+          onClick={() => onChange(opt.value)}
+          className={`flex-1 py-3.5 px-4 rounded-lg text-left transition-all ${
+            value === opt.value
+              ? "border-2 border-accent-coral bg-accent-coral-light"
+              : "border border-border bg-card hover:border-accent-coral/50"
+          }`}
+        >
+          <p className={`text-sm font-semibold leading-tight ${value === opt.value ? "text-accent-coral" : "text-foreground"}`}>
+            {opt.label}
+          </p>
+          <p className="text-xs text-muted-foreground mt-1 leading-tight">{opt.subtitle}</p>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+export function LetterForm({ onBack, onSubmit, initialData }: LetterFormProps) {
+  const [mode, setMode] = useState<InputMode>("manual");
+  const [companyName, setCompanyName] = useState(initialData?.companyName ?? "");
+  const [position, setPosition] = useState(initialData?.position ?? "");
+  const [jobDescription, setJobDescription] = useState(initialData?.jobDescription ?? "");
+  const [additionalNotes, setAdditionalNotes] = useState(initialData?.additionalNotes ?? "");
+  const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>(initialData?.uploadedFiles ?? []);
+  const [writingTone, setWritingTone] = useState<WritingTone>(initialData?.writingTone ?? "formal");
+  const [languageStyle, setLanguageStyle] = useState<LanguageStyle>(initialData?.languageStyle ?? "straightforward");
+  const [language, setLanguage] = useState<LetterLanguage>(initialData?.language ?? "auto");
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoadingFile, setIsLoadingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const settingsSummary = `${TONE_SUMMARY[writingTone]} · ${STYLE_SUMMARY[languageStyle]} · ${LANGUAGE_SUMMARY[language]}`;
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsLoadingFile(true);
+    try {
+      const uploaded = await fileToUploadedFile(file);
+      setUploadedFiles([uploaded]);
+      setError(null);
+    } catch {
+      setError("Failed to read file. Please try again.");
+    } finally {
+      setIsLoadingFile(false);
+      e.target.value = "";
+    }
+  };
+
+  const removeFile = () => setUploadedFiles([]);
+
+  const handleSubmit = () => {
+    if (!companyName.trim() || !position.trim()) {
+      setError("Please fill in Company Name and Position.");
       return;
     }
-
-    setError(null);
-    setIsGenerating(true);
-    try {
-      const content = await generateApplicationLetter({
-        cvData,
-        companyName: companyName.trim(),
-        position: position.trim(),
-        jobDescription: jobDescription.trim(),
-        additionalNotes: additionalNotes.trim() || undefined,
-        useAiEnhance,
-      });
-      onGenerated({
-        companyName: companyName.trim(),
-        position: position.trim(),
-        jobDescription: jobDescription.trim(),
-        content,
-      });
-    } catch {
-      setError("Failed to generate letter. Please check your API key and try again.");
-    } finally {
-      setIsGenerating(false);
+    if (mode === "manual" && !jobDescription.trim()) {
+      setError("Please provide a job description.");
+      return;
     }
+    if (mode === "upload" && uploadedFiles.length === 0) {
+      setError("Please upload a job description file.");
+      return;
+    }
+    setError(null);
+    onSubmit({
+      companyName: companyName.trim(),
+      position: position.trim(),
+      jobDescription: jobDescription.trim(),
+      additionalNotes: additionalNotes.trim() || undefined,
+      writingTone,
+      languageStyle,
+      language,
+      uploadedFiles: mode === "upload" ? uploadedFiles : undefined,
+    });
   };
 
   return (
@@ -82,213 +201,244 @@ export function LetterForm({ cvData, onBack, onGenerated }: LetterFormProps) {
         >
           <ArrowLeft size={16} /> Back
         </button>
-        <h1 className="text-[22px] font-bold text-foreground">
-          Create Application Letter
-        </h1>
+        <h1 className="text-[22px] font-bold text-foreground">Create Application Letter</h1>
         <p className="text-sm text-muted-foreground">
-          Generate a professional application letter based on your resume and the
-          job description.
+          Choose how you'd like to provide the job details.
         </p>
       </div>
 
       {/* Mode Selector */}
       <div className="grid grid-cols-2 gap-4">
+        {/* Manual Input */}
         <button
+          type="button"
           onClick={() => setMode("manual")}
-          className={`p-5 rounded-xl border text-left transition-all ${
+          className={`flex flex-col items-center gap-3 p-6 rounded-xl transition-all ${
             mode === "manual"
-              ? "border-accent-coral bg-accent-coral-light ring-1 ring-accent-coral/20"
-              : "border-border bg-card hover:border-accent-coral/50"
+              ? "border-2 border-accent-coral bg-accent-coral-light"
+              : "border border-border bg-card hover:border-accent-coral/50"
           }`}
         >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-accent-coral-light flex items-center justify-center shrink-0">
-              <Pencil size={20} className="text-accent-coral" />
-            </div>
-            <div>
-              <div className="font-semibold text-sm text-foreground">
-                Manual Input
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Type or paste your details manually
-              </p>
-            </div>
+          <div
+            className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+              mode === "manual" ? "bg-accent-coral" : "bg-muted"
+            }`}
+          >
+            <Pencil size={20} className={mode === "manual" ? "text-white" : "text-muted-foreground"} />
+          </div>
+          <div className="text-center">
+            <p className={`font-semibold text-base ${mode === "manual" ? "text-accent-coral" : "text-muted-foreground"}`}>
+              Manual Input
+            </p>
+            <p className="text-[13px] text-muted-foreground mt-0.5">Type or paste job details manually</p>
           </div>
         </button>
+
+        {/* Upload File */}
         <button
+          type="button"
           onClick={() => setMode("upload")}
-          className={`p-5 rounded-xl border text-left transition-all ${
+          className={`flex flex-col items-center gap-3 p-6 rounded-xl transition-all ${
             mode === "upload"
-              ? "border-accent-coral bg-accent-coral-light ring-1 ring-accent-coral/20"
-              : "border-border bg-card hover:border-accent-coral/50"
+              ? "border-2 border-accent-coral bg-accent-coral-light"
+              : "border border-border bg-card hover:border-accent-coral/50"
           }`}
         >
-          <div className="flex items-start gap-4">
-            <div className="w-12 h-12 rounded-full bg-accent-coral-light flex items-center justify-center shrink-0">
-              <Upload size={20} className="text-accent-coral" />
-            </div>
-            <div>
-              <div className="font-semibold text-sm text-foreground">
-                Upload File
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Upload a job description document
-              </p>
-            </div>
+          <div
+            className={`w-12 h-12 rounded-lg flex items-center justify-center ${
+              mode === "upload" ? "bg-accent-coral" : "bg-muted"
+            }`}
+          >
+            <CloudUpload size={20} className={mode === "upload" ? "text-white" : "text-muted-foreground"} />
+          </div>
+          <div className="text-center">
+            <p className={`font-semibold text-base ${mode === "upload" ? "text-accent-coral" : "text-muted-foreground"}`}>
+              Upload File
+            </p>
+            <p className="text-[13px] text-muted-foreground mt-0.5">Upload a job description document</p>
           </div>
         </button>
       </div>
 
-      {/* Form */}
-      <div className="bg-card border border-border rounded-xl p-6 space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
-              Company Name
-            </label>
-            <input
-              type="text"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
-              placeholder="e.g. Google"
-            />
-          </div>
-          <div className="space-y-1.5">
-            <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
-              Position
-            </label>
-            <input
-              type="text"
-              value={position}
-              onChange={(e) => setPosition(e.target.value)}
-              className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
-              placeholder="e.g. Senior Frontend Engineer"
-            />
-          </div>
+      {/* Job Information Card */}
+      <div className="bg-card border border-border rounded-xl overflow-hidden">
+        {/* Card header */}
+        <div className="px-6 py-5 border-b border-border">
+          <p className="font-semibold text-[15px] text-foreground">Job Information</p>
+          <p className="text-[13px] text-muted-foreground mt-0.5">
+            Upload a file or paste job details and provide additional information
+          </p>
         </div>
 
-        <div className="space-y-1.5">
-          <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
-            Job Description
-          </label>
-
-          {mode === "manual" ? (
-            <>
-              {/* Tab bar */}
-              <div className="flex gap-1 bg-muted p-1 rounded-lg w-fit">
+        <div className="p-6 space-y-4">
+          {/* Upload area */}
+          {mode === "upload" && (
+            uploadedFiles.length > 0 ? (
+              <div className="flex items-center justify-between p-3 bg-muted/50 border border-border rounded-lg">
+                <div className="flex items-center gap-2 min-w-0">
+                  <div className="w-8 h-8 rounded bg-accent-coral-light flex items-center justify-center shrink-0">
+                    <CloudUpload size={14} className="text-accent-coral" />
+                  </div>
+                  <span className="text-sm text-foreground truncate">{uploadedFiles[0].name}</span>
+                </div>
                 <button
-                  onClick={() => setJdMode("paste")}
-                  className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                    jdMode === "paste"
-                      ? "bg-card shadow-sm text-foreground font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
+                  type="button"
+                  onClick={removeFile}
+                  className="ml-2 text-muted-foreground hover:text-foreground shrink-0"
                 >
-                  Paste Text
-                </button>
-                <button
-                  onClick={() => setJdMode("upload")}
-                  className={`px-3 py-1.5 text-xs rounded-md transition-all ${
-                    jdMode === "upload"
-                      ? "bg-card shadow-sm text-foreground font-semibold"
-                      : "text-muted-foreground hover:text-foreground"
-                  }`}
-                >
-                  Upload File
+                  <X size={16} />
                 </button>
               </div>
-
-              {jdMode === "paste" ? (
-                <textarea
-                  value={jobDescription}
-                  onChange={(e) => setJobDescription(e.target.value)}
-                  className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none min-h-[150px] resize-none text-sm placeholder:text-muted-foreground/50 leading-relaxed"
-                  placeholder="Paste the job description here..."
-                />
-              ) : (
-                <label className="flex flex-col items-center gap-3 p-8 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-accent-coral hover:bg-muted/50 transition-colors">
-                  <Upload size={24} className="text-muted-foreground" />
-                  <span className="text-sm text-muted-foreground">
-                    Click to upload a text file
+            ) : (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="w-full flex flex-col items-center justify-center gap-3 p-8 bg-card border border-border rounded-xl hover:border-accent-coral transition-colors"
+                disabled={isLoadingFile}
+              >
+                <CloudUpload size={40} className="text-muted-foreground/60" />
+                <div className="text-center space-y-0.5">
+                  <p className="text-[15px] font-medium text-foreground">
+                    {isLoadingFile ? "Reading file..." : "Click to upload a file"}
+                  </p>
+                  <p className="text-[13px] text-muted-foreground">
+                    Supports PDF, DOCX, TXT, PNG, JPG, WEBP
+                  </p>
+                </div>
+                {/* AI feature pill */}
+                <div className="flex items-center gap-2 bg-accent-coral-light rounded-md px-3.5 py-2">
+                  <Sparkles size={14} className="text-accent-coral shrink-0" />
+                  <span className="text-xs text-accent-coral text-center">
+                    AI will extract job details from your uploaded file automatically
                   </span>
-                  <input
-                    type="file"
-                    accept=".txt,.md"
-                    className="hidden"
-                    onChange={handleFileUpload}
-                  />
-                </label>
-              )}
-            </>
-          ) : (
-            <label className="flex flex-col items-center gap-3 p-8 border-2 border-dashed border-border rounded-xl cursor-pointer hover:border-accent-coral hover:bg-muted/50 transition-colors">
-              <Upload size={24} className="text-muted-foreground" />
-              <span className="text-sm font-medium text-foreground">
-                Click to upload job description
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Supports TXT, MD files
-              </span>
-              <input
-                type="file"
-                accept=".txt,.md"
-                className="hidden"
-                onChange={handleFileUpload}
-              />
-            </label>
+                </div>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept=".pdf,.docx,.txt,.png,.jpg,.jpeg,.webp"
+                  className="hidden"
+                  onChange={handleFileChange}
+                  disabled={isLoadingFile}
+                />
+              </button>
+            )
           )}
+
+          {/* Fields */}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-medium text-foreground">Company Name</label>
+              <input
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
+                placeholder="e.g. Google"
+              />
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-medium text-foreground">Position / Job Title</label>
+              <input
+                type="text"
+                value={position}
+                onChange={(e) => setPosition(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
+                placeholder="e.g. Senior Frontend Engineer"
+              />
+            </div>
+          </div>
+
+          {mode === "manual" && (
+            <div className="space-y-1.5">
+              <label className="text-[13px] font-medium text-foreground">Job Description</label>
+              <textarea
+                value={jobDescription}
+                onChange={(e) => setJobDescription(e.target.value)}
+                className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none min-h-[150px] resize-none text-sm placeholder:text-muted-foreground/50 leading-relaxed"
+                placeholder="Paste the job description here..."
+              />
+            </div>
+          )}
+
+          <div className="space-y-1.5">
+            <label className="text-[13px] font-medium text-foreground">Additional Notes</label>
+            <input
+              type="text"
+              value={additionalNotes}
+              onChange={(e) => setAdditionalNotes(e.target.value)}
+              className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
+              placeholder="e.g. Available from April, salary expectation $XXk..."
+            />
+          </div>
         </div>
       </div>
 
-      {/* Additional Notes */}
-      <div className="space-y-1.5">
-        <label className="text-[13px] font-medium text-muted-foreground uppercase tracking-wider">
-          Additional Notes
-        </label>
-        <input
-          type="text"
-          value={additionalNotes}
-          onChange={(e) => setAdditionalNotes(e.target.value)}
-          className="w-full px-3.5 py-2.5 bg-card text-foreground border border-border rounded-lg focus:border-accent-coral focus:ring-1 focus:ring-accent-coral outline-none transition-all placeholder:text-muted-foreground/50"
-          placeholder="e.g. Available from April, salary expectation $XXk..."
-        />
-      </div>
+      {/* Letter Settings (collapsible) */}
+      <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <div className="bg-card border border-border rounded-xl overflow-hidden">
+          <CollapsibleTrigger asChild>
+            <button
+              type="button"
+              className="w-full flex items-center justify-between px-6 py-5 hover:bg-muted/30 transition-colors"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <Sparkles size={16} className="text-accent-coral shrink-0" />
+                <span className="font-semibold text-sm text-foreground">Letter Settings</span>
+                {!settingsOpen && (
+                  <span className="text-xs text-muted-foreground truncate">{settingsSummary}</span>
+                )}
+              </div>
+              {settingsOpen ? (
+                <ChevronUp size={16} className="text-muted-foreground shrink-0 ml-2" />
+              ) : (
+                <ChevronDown size={16} className="text-muted-foreground shrink-0 ml-2" />
+              )}
+            </button>
+          </CollapsibleTrigger>
 
-      {/* AI Enhance Toggle */}
-      <label className="flex items-center gap-3 cursor-pointer">
-        <div className="relative">
-          <input
-            type="checkbox"
-            checked={useAiEnhance}
-            onChange={(e) => setUseAiEnhance(e.target.checked)}
-            className="sr-only peer"
-          />
-          <div className="w-9 h-5 bg-muted rounded-full peer-checked:bg-accent-coral transition-colors" />
-          <div className="absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-transform peer-checked:translate-x-4" />
+          <CollapsibleContent>
+            <div className="px-6 pb-6 space-y-6 border-t border-border pt-5">
+              {/* Writing Tone */}
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Mic size={16} className="text-muted-foreground" />
+                  <p className="text-[13px] font-semibold text-foreground">Writing Tone</p>
+                </div>
+                <RadioCards options={TONE_OPTIONS} value={writingTone} onChange={setWritingTone} />
+              </div>
+
+              {/* Language Style */}
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <PenTool size={16} className="text-muted-foreground" />
+                  <p className="text-[13px] font-semibold text-foreground">Language Style</p>
+                </div>
+                <RadioCards options={STYLE_OPTIONS} value={languageStyle} onChange={setLanguageStyle} />
+              </div>
+
+              {/* Language */}
+              <div className="space-y-2.5">
+                <div className="flex items-center gap-2">
+                  <Globe size={16} className="text-muted-foreground" />
+                  <p className="text-[13px] font-semibold text-foreground">Language</p>
+                </div>
+                <RadioCards options={LANGUAGE_OPTIONS} value={language} onChange={setLanguage} />
+              </div>
+            </div>
+          </CollapsibleContent>
         </div>
-        <span className="text-sm text-foreground">Use AI to enhance writing</span>
-        <Sparkles size={14} className="text-accent-coral" />
-      </label>
+      </Collapsible>
 
-      {error && (
-        <p className="text-sm text-destructive">{error}</p>
-      )}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {/* Actions */}
       <div className="flex justify-end gap-3">
         <Button variant="ghost" onClick={onBack}>
           Cancel
         </Button>
-        <Button onClick={handleGenerate} disabled={isGenerating}>
-          {isGenerating ? (
-            <>
-              <Loader2 size={16} className="animate-spin" />
-              Generating...
-            </>
-          ) : (
-            "Generate Letter"
-          )}
+        <Button onClick={handleSubmit} disabled={isLoadingFile} className="gap-2">
+          <Sparkles size={15} />
+          Generate Letter
         </Button>
       </div>
     </div>

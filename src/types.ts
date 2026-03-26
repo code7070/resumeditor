@@ -59,6 +59,17 @@ export interface CVData {
   lastSaved?: string;
 }
 
+export type WritingTone = "professional" | "casual" | "formal";
+export type LanguageStyle = "polished" | "straightforward" | "creative";
+export type LetterLanguage = "english" | "indonesian" | "auto";
+
+export interface UploadedFile {
+  name: string;
+  mimeType: string;
+  base64Data: string;
+  textContent?: string;
+}
+
 export interface ApplicationLetter {
   id: string;
   companyName: string;
